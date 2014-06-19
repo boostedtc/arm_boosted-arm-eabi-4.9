@@ -1590,7 +1590,7 @@
 #define HAVE_return_addr_mask (TARGET_ARM)
 #define HAVE_untyped_call 1
 #define HAVE_untyped_return 1
-#define HAVE_casesi (TARGET_32BIT || optimize_size || flag_pic)
+#define HAVE_casesi (TARGET_32BIT || ((optimize_size || flag_pic) && !inline_thumb1_jump_table))
 #define HAVE_thumb1_casesi_internal_pic (TARGET_THUMB1)
 #define HAVE_indirect_jump 1
 #define HAVE_prologue 1

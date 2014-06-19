@@ -53,7 +53,7 @@ if [ x$1 != x ] ; then
   prefix=$1
   shift
 else
-  prefix=/tmp/boosted-4.9-Tmdn5/arm-eabi-4.9
+  prefix=/tmp/boosted-4.9-DZ0ue/arm-eabi-4.9
 fi
 
 # Allow for alternate isysroot in which to find headers
