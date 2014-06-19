@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/tmp/boosted-4.9-Qba4c/arm-eabi-4.9/x86_64-linux-gnu/arm-eabi/lib'
+libdir='/tmp/boosted-4.9-Tmdn5/arm-eabi-4.9/x86_64-linux-gnu/arm-eabi/lib'
