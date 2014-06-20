@@ -1,9 +1,8 @@
 This is ld.info, produced by makeinfo version 5.2 from ld.texinfo.
 
-This file documents the GNU linker LD (Linux/GNU Binutils) version
-2.23.52.0.2.
+This file documents the GNU linker LD (GNU Binutils) version 2.24.51.
 
-   Copyright (C) 1991-2013 Free Software Foundation, Inc.
+   Copyright (C) 1991-2014 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -22,8 +21,7 @@ File: ld.info,  Node: Top,  Next: Overview,  Up: (dir)
 LD
 **
 
-This file documents the GNU linker ld (Linux/GNU Binutils) version
-2.23.52.0.2.
+This file documents the GNU linker ld (GNU Binutils) version 2.24.51.
 
    This document is distributed under the terms of the GNU Free
 Documentation License version 1.3.  A copy of the license is included in
@@ -394,9 +392,8 @@ GNU linker:
 '--gpsize=VALUE'
      Set the maximum size of objects to be optimized using the GP
      register to SIZE.  This is only meaningful for object file formats
-     such as MIPS ECOFF which supports putting large and small objects
-     into different sections.  This is ignored for other object file
-     formats.
+     such as MIPS ELF that support putting large and small objects into
+     different sections.  This is ignored for other object file formats.
 
 '-h NAME'
 '-soname=NAME'
@@ -770,10 +767,6 @@ GNU linker:
      'relro'
           Create an ELF 'PT_GNU_RELRO' segment header in the object.
 
-     'nosecondary'
-          Convert secondary symbols to weak symbols when generating a
-          shared library.
-
      'max-page-size=VALUE'
           Set the emulation maximum page size to VALUE.
 
@@ -951,8 +944,9 @@ GNU linker:
      easily processed by a script if necessary.  The symbols are printed
      out, sorted by name.  For each symbol, a list of file names is
      given.  If the symbol is defined, the first file listed is the
-     location of the definition.  The remaining files contain references
-     to the symbol.
+     location of the definition.  If the symbol is defined as a common
+     value then any files where this happens appear next.  Finally any
+     files that reference the symbol are listed.
 
 '--no-define-common'
      This option inhibits the assignment of addresses to common symbols.
@@ -1191,8 +1185,8 @@ GNU linker:
      supported on a few targets.  *Note 'ld' and the H8/300: H8/300.
      *Note 'ld' and the Intel 960 family: i960.  *Note 'ld' and Xtensa
      Processors: Xtensa.  *Note 'ld' and the 68HC11 and 68HC12:
-     M68HC11/68HC12.  *Note 'ld' and PowerPC 32-bit ELF Support: PowerPC
-     ELF32.
+     M68HC11/68HC12.  *Note 'ld' and the Altera Nios II: Nios II.  *Note
+     'ld' and PowerPC 32-bit ELF Support: PowerPC ELF32.
 
      On some platforms the '--relax' option performs target specific,
      global optimizations that become possible when the linker resolves
@@ -1376,8 +1370,8 @@ GNU linker:
      SECTIONNAME.
 
 '-Ttext-segment=ORG'
-     When creating an ELF executable or shared object, it will set the
-     address of the first byte of the text segment.
+     When creating an ELF executable, it will set the address of the
+     first byte of the text segment.
 
 '-Trodata-segment=ORG'
      When creating an ELF executable or shared object for a target where
@@ -1642,15 +1636,15 @@ GNU linker:
 
 '--build-id'
 '--build-id=STYLE'
-     Request creation of '.note.gnu.build-id' ELF note section.  The
-     contents of the note are unique bits identifying this linked file.
-     STYLE can be 'uuid' to use 128 random bits, 'sha1' to use a 160-bit
-     SHA1 hash on the normative parts of the output contents, 'md5' to
-     use a 128-bit MD5 hash on the normative parts of the output
-     contents, or '0xHEXSTRING' to use a chosen bit string specified as
-     an even number of hexadecimal digits ('-' and ':' characters
-     between digit pairs are ignored).  If STYLE is omitted, 'sha1' is
-     used.
+     Request the creation of a '.note.gnu.build-id' ELF note section or
+     a '.build-id' COFF section.  The contents of the note are unique
+     bits identifying this linked file.  STYLE can be 'uuid' to use 128
+     random bits, 'sha1' to use a 160-bit SHA1 hash on the normative
+     parts of the output contents, 'md5' to use a 128-bit MD5 hash on
+     the normative parts of the output contents, or '0xHEXSTRING' to use
+     a chosen bit string specified as an even number of hexadecimal
+     digits ('-' and ':' characters between digit pairs are ignored).
+     If STYLE is omitted, 'sha1' is used.
 
      The 'md5' and 'sha1' styles produces an identifier that is always
      the same in an identical output file, but will be unique among all
@@ -1781,7 +1775,7 @@ either a space or an equals sign.
 '--heap RESERVE'
 '--heap RESERVE,COMMIT'
      Specify the number of bytes of memory to reserve (and optionally
-     commit) to be used as heap for this program.  The default is 1Mb
+     commit) to be used as heap for this program.  The default is 1MB
      reserved, 4K committed.  [This option is specific to the i386 PE
      targeted port of the linker]
 
@@ -1807,6 +1801,13 @@ either a space or an equals sign.
      "[operating systems]" section of the BOOT.INI. Otherwise, this bit
      has no effect.  [This option is specific to PE targeted ports of
      the linker]
+
+'--disable-large-address-aware'
+     Reverts the effect of a previous '--large-address-aware' option.
+     This is useful if '--large-address-aware' is always set by the
+     compiler driver (e.g.  Cygwin gcc) and the executable does not
+     support virtual addresses greater than 2 gigabytes.  [This option
+     is specific to PE targeted ports of the linker]
 
 '--major-image-version VALUE'
      Sets the major number of the "image version".  Defaults to 1.
@@ -1853,12 +1854,13 @@ either a space or an equals sign.
      option is specific to the i386 PE targeted port of the linker]
 
 '--enable-auto-image-base'
-     Automatically choose the image base for DLLs, unless one is
-     specified using the '--image-base' argument.  By using a hash
-     generated from the dllname to create unique image bases for each
-     DLL, in-memory collisions and relocations which can delay program
-     execution are avoided.  [This option is specific to the i386 PE
-     targeted port of the linker]
+'--enable-auto-image-base=VALUE'
+     Automatically choose the image base for DLLs, optionally starting
+     with base VALUE, unless one is specified using the '--image-base'
+     argument.  By using a hash generated from the dllname to create
+     unique image bases for each DLL, in-memory collisions and
+     relocations which can delay program execution are avoided.  [This
+     option is specific to the i386 PE targeted port of the linker]
 
 '--disable-auto-image-base'
      Do not automatically generate a unique image base.  If there is no
@@ -2026,7 +2028,7 @@ either a space or an equals sign.
 '--stack RESERVE'
 '--stack RESERVE,COMMIT'
      Specify the number of bytes of memory to reserve (and optionally
-     commit) to be used as stack for this program.  The default is 2Mb
+     commit) to be used as stack for this program.  The default is 2MB
      reserved, 4K committed.  [This option is specific to the i386 PE
      targeted port of the linker]
 
@@ -2070,6 +2072,12 @@ either a space or an equals sign.
 
 '--tsaware'
      The image is Terminal Server aware.
+
+'--insert-timestamp'
+     Insert a real timestamp into the image, rather than the default
+     value of zero.  This will result in a slightly different results
+     with each invocation, which could be helpful for distributing
+     unique images.
 
 2.1.2 Options specific to C6X uClinux targets
 ---------------------------------------------
@@ -2121,6 +2129,21 @@ generation when linking for 68K targets.
      This option tells the linker which GOT generation scheme to use.
      TYPE should be one of 'single', 'negative', 'multigot' or 'target'.
      For more information refer to the Info entry for 'ld'.
+
+2.1.5 Options specific to MIPS targets
+--------------------------------------
+
+The following options are supported to control microMIPS instruction
+generation when linking for MIPS targets.
+
+'--insn32'
+'--no-insn32'
+     These options control the choice of microMIPS instructions used in
+     code generated by the linker, such as that in the PLT or lazy
+     binding stubs, or in relaxation.  If '--insn32' is used, then the
+     linker only uses 32-bit instruction encodings.  By default or if
+     '--no-insn32' is used, all instruction encodings are used,
+     including 16-bit ones where possible.
 
 
 File: ld.info,  Node: Environment,  Prev: Options,  Up: Invocation
@@ -2913,7 +2936,7 @@ following C declaration, at file scope:
 
        int foo = 1000;
 
-   creates a entry called 'foo' in the symbol table.  This entry holds
+   creates an entry called 'foo' in the symbol table.  This entry holds
 the address of an 'int' sized block of memory where the number 1000 is
 initially stored.
 
@@ -2930,7 +2953,7 @@ address.  Whereas:
 
        int * a = & foo;
 
-   looks up the symbol 'foo' in the symbol table, gets it address and
+   looks up the symbol 'foo' in the symbol table, gets its address and
 then copies this address into the block of memory associated with the
 variable 'a'.
 
@@ -3025,21 +3048,23 @@ File: ld.info,  Node: Output Section Description,  Next: Output Section Name,  U
 The full description of an output section looks like this:
      SECTION [ADDRESS] [(TYPE)] :
        [AT(LMA)]
-       [ALIGN(SECTION_ALIGN)]
+       [ALIGN(SECTION_ALIGN) | ALIGN_WITH_INPUT]
        [SUBALIGN(SUBSECTION_ALIGN)]
        [CONSTRAINT]
        {
          OUTPUT-SECTION-COMMAND
          OUTPUT-SECTION-COMMAND
          ...
-       } [>REGION] [AT>LMA_REGION] [:PHDR :PHDR ...] [=FILLEXP]
+       } [>REGION] [AT>LMA_REGION] [:PHDR :PHDR ...] [=FILLEXP] [,]
 
    Most output sections do not use most of the optional section
 attributes.
 
    The whitespace around SECTION is required, so that the section name
 is unambiguous.  The colon and the curly braces are also required.  The
-line breaks and other white space are optional.
+comma at the end may be required if a FILLEXP is used and the next
+SECTIONS-COMMAND looks like a continuation of the expression.  The line
+breaks and other white space are optional.
 
    Each OUTPUT-SECTION-COMMAND may be one of the following:
 
@@ -3285,8 +3310,10 @@ sections into ascending order by name before placing them in the output
 file.
 
    'SORT_BY_ALIGNMENT' is very similar to 'SORT_BY_NAME'.  The
-difference is 'SORT_BY_ALIGNMENT' will sort sections into ascending
-order by alignment before placing them in the output file.
+difference is 'SORT_BY_ALIGNMENT' will sort sections into descending
+order by alignment before placing them in the output file.  Larger
+alignments are placed before smaller alignments in order to reduce the
+amount of padding necessary.
 
    'SORT_BY_INIT_PRIORITY' is very similar to 'SORT_BY_NAME'.  The
 difference is 'SORT_BY_INIT_PRIORITY' will sort sections into ascending
@@ -3300,10 +3327,10 @@ there can be at most 1 level of nesting for section sorting commands.
 
   1. 'SORT_BY_NAME' ('SORT_BY_ALIGNMENT' (wildcard section pattern)).
      It will sort the input sections by name first, then by alignment if
-     2 sections have the same name.
+     two sections have the same name.
   2. 'SORT_BY_ALIGNMENT' ('SORT_BY_NAME' (wildcard section pattern)).
      It will sort the input sections by alignment first, then by name if
-     2 sections have the same alignment.
+     two sections have the same alignment.
   3. 'SORT_BY_NAME' ('SORT_BY_NAME' (wildcard section pattern)) is
      treated the same as 'SORT_BY_NAME' (wildcard section pattern).
   4. 'SORT_BY_ALIGNMENT' ('SORT_BY_ALIGNMENT' (wildcard section
@@ -3564,14 +3591,19 @@ File: ld.info,  Node: Output Section Discarding,  Next: Output Section Attribute
 3.6.7 Output Section Discarding
 -------------------------------
 
-The linker will not create output sections with no contents.  This is
-for convenience when referring to input sections that may or may not be
-present in any of the input files.  For example:
+The linker will not normally create output sections with no contents.
+This is for convenience when referring to input sections that may or may
+not be present in any of the input files.  For example:
      .foo : { *(.foo) }
 will only create a '.foo' section in the output file if there is a
 '.foo' section in at least one input file, and if the input sections are
 not all empty.  Other link script directives that allocate space in an
-output section will also create the output section.
+output section will also create the output section.  So too will
+assignments to dot even if the assignment does not create space, except
+for '. = 0', '. = . + 0', '. = sym', '. = . + sym' and '. = ALIGN (. !=
+0, expr, 1)' when 'sym' is an absolute symbol of value 0 defined in the
+script.  This allows you to force output of an empty section with '. =
+.'.
 
    The linker will ignore address assignments (*note Output Section
 Address::) on discarded output sections, except when the linker script
@@ -3729,7 +3761,10 @@ File: ld.info,  Node: Forced Output Alignment,  Next: Forced Input Alignment,  P
 3.6.8.3 Forced Output Alignment
 ...............................
 
-You can increase an output section's alignment by using ALIGN.
+You can increase an output section's alignment by using ALIGN. As an
+alternative you can enforce that the difference between the VMA and LMA
+remains intact throughout this output section with the ALIGN_WITH_INPUT
+attribute.
 
 
 File: ld.info,  Node: Forced Input Alignment,  Next: Output Section Constraint,  Prev: Forced Output Alignment,  Up: Output Section Attributes
@@ -3839,13 +3874,16 @@ description.  The full syntax of the 'OVERLAY' command is as follows:
              ...
            } [:PHDR...] [=FILL]
          ...
-       } [>REGION] [:PHDR...] [=FILL]
+       } [>REGION] [:PHDR...] [=FILL] [,]
 
    Everything is optional except 'OVERLAY' (a keyword), and each section
 must have a name (SECNAME1 and SECNAME2 above).  The section definitions
 within the 'OVERLAY' construct are identical to those within the general
 'SECTIONS' construct (*note SECTIONS::), except that no addresses and no
 memory regions may be defined for sections within an 'OVERLAY'.
+
+   The comma at the end may be required if a FILL is used and the next
+SECTIONS-COMMAND looks like a continuation of the expression.
 
    The sections are all defined with the same starting address.  The
 load addresses of the sections are arranged such that they are
@@ -4822,12 +4860,14 @@ use in linker script expressions.
 
 'DATA_SEGMENT_RELRO_END(OFFSET, EXP)'
      This defines the end of the 'PT_GNU_RELRO' segment when '-z relro'
-     option is used.  Second argument is returned.  When '-z relro'
-     option is not present, 'DATA_SEGMENT_RELRO_END' does nothing,
-     otherwise 'DATA_SEGMENT_ALIGN' is padded so that EXP + OFFSET is
-     aligned to the most commonly used page boundary for particular
-     target.  If present in the linker script, it must always come in
-     between 'DATA_SEGMENT_ALIGN' and 'DATA_SEGMENT_END'.
+     option is used.  When '-z relro' option is not present,
+     'DATA_SEGMENT_RELRO_END' does nothing, otherwise
+     'DATA_SEGMENT_ALIGN' is padded so that EXP + OFFSET is aligned to
+     the most commonly used page boundary for particular target.  If
+     present in the linker script, it must always come in between
+     'DATA_SEGMENT_ALIGN' and 'DATA_SEGMENT_END'.  Evaluates to the
+     second argument plus any padding needed at the end of the
+     'PT_GNU_RELRO' segment due to section alignment.
 
             . = DATA_SEGMENT_RELRO_END(24, .);
 
@@ -4855,6 +4895,10 @@ use in linker script expressions.
      Return the absolute LMA of the named SECTION.  (*note Output
      Section LMA::).
 
+'LOG2CEIL(EXP)'
+     Return the binary logarithm of EXP rounded towards infinity.
+     'LOG2CEIL(0)' returns 0.
+
 'MAX(EXP1, EXP2)'
      Returns the maximum of EXP1 and EXP2.
 
@@ -4872,11 +4916,11 @@ use in linker script expressions.
 
 'SEGMENT_START(SEGMENT, DEFAULT)'
      Return the base address of the named SEGMENT.  If an explicit value
-     has been given for this segment (with a command-line '-T' option)
-     that value will be returned; otherwise the value will be DEFAULT.
-     At present, the '-T' command-line option can only be used to set
-     the base address for the "text", "data", and "bss" sections, but
-     you can use 'SEGMENT_START' with any segment name.
+     has already been given for this segment (with a command-line '-T'
+     option) then that value will be returned otherwise the value will
+     be DEFAULT.  At present, the '-T' command-line option can only be
+     used to set the base address for the "text", "data", and "bss"
+     sections, but you can use 'SEGMENT_START' with any segment name.
 
 'SIZEOF(SECTION)'
      Return the size in bytes of the named SECTION, if that section has
@@ -4949,8 +4993,11 @@ not listed.
 * ARM::				'ld' and the ARM family
 * HPPA ELF32::                  'ld' and HPPA 32-bit ELF
 * M68K::			'ld' and the Motorola 68K family
+* MIPS::			'ld' and the MIPS family
 * MMIX::			'ld' and MMIX
 * MSP430::			'ld' and MSP430
+* NDS32::			'ld' and NDS32
+* Nios II::			'ld' and the Altera Nios II
 * PowerPC ELF32::		'ld' and PowerPC 32-bit ELF Support
 * PowerPC64 ELF64::		'ld' and PowerPC64 64-bit ELF Support
 * SPU ELF::			'ld' and SPU ELF Support
@@ -5041,18 +5088,6 @@ relative 'bal' and 'cal' instructions, respectively.  'ld' also turns
 'cal' instructions into 'bal' instructions when it determines that the
 target subroutine is a leaf routine (that is, the target subroutine does
 not itself call any subroutines).
-
-   The '--fix-cortex-a8' switch enables a link-time workaround for an
-erratum in certain Cortex-A8 processors.  The workaround is enabled by
-default if you are targeting the ARM v7-A architecture profile.  It can
-be enabled otherwise by specifying '--fix-cortex-a8', or disabled
-unconditionally by specifying '--no-fix-cortex-a8'.
-
-   The erratum only affects Thumb-2 code.  Please contact ARM for
-further details.
-
-   The '--no-merge-exidx-entries' switch disables the merging of
-adjacent exidx entries in debuginfo.
 
 
 File: ld.info,  Node: M68HC11/68HC12,  Next: ARM,  Prev: i960,  Up: Machine Dependent
@@ -5254,6 +5289,22 @@ service at most 'N' bytes from the input sections.
 only, because it relies on object files properties not present
 otherwise.
 
+   The '--fix-cortex-a8' switch enables a link-time workaround for an
+erratum in certain Cortex-A8 processors.  The workaround is enabled by
+default if you are targeting the ARM v7-A architecture profile.  It can
+be enabled otherwise by specifying '--fix-cortex-a8', or disabled
+unconditionally by specifying '--no-fix-cortex-a8'.
+
+   The erratum only affects Thumb-2 code.  Please contact ARM for
+further details.
+
+   The '--no-merge-exidx-entries' switch disables the merging of
+adjacent exidx entries in debuginfo.
+
+   The '--long-plt' option enables the use of 16 byte PLT entries which
+support up to 4Gb of code.  The default is to use 12 byte PLT entries
+which only support 512Mb of code.
+
 
 File: ld.info,  Node: HPPA ELF32,  Next: M68K,  Prev: ARM,  Up: Machine Dependent
 
@@ -5286,7 +5337,7 @@ create a larger group (of one section).  If input sections are too
 large, it may not be possible for a branch to reach its stub.
 
 
-File: ld.info,  Node: M68K,  Next: MMIX,  Prev: HPPA ELF32,  Up: Machine Dependent
+File: ld.info,  Node: M68K,  Next: MIPS,  Prev: HPPA ELF32,  Up: Machine Dependent
 
 4.6 'ld' and the Motorola 68K family
 ====================================
@@ -5304,9 +5355,22 @@ same GOT, but references from different input object files might access
 different GOTs.  Not all environments support such GOTs.
 
 
-File: ld.info,  Node: MMIX,  Next: MSP430,  Prev: M68K,  Up: Machine Dependent
+File: ld.info,  Node: MIPS,  Next: MMIX,  Prev: M68K,  Up: Machine Dependent
 
-4.7 'ld' and MMIX
+4.7 'ld' and the MIPS family
+============================
+
+The '--insn32' and '--no-insn32' options control the choice of microMIPS
+instructions used in code generated by the linker, such as that in the
+PLT or lazy binding stubs, or in relaxation.  If '--insn32' is used,
+then the linker only uses 32-bit instruction encodings.  By default or
+if '--no-insn32' is used, all instruction encodings are used, including
+16-bit ones where possible.
+
+
+File: ld.info,  Node: MMIX,  Next: MSP430,  Prev: MIPS,  Up: Machine Dependent
+
+4.8 'ld' and MMIX
 =================
 
 For MMIX, there is a choice of generating 'ELF' object files or 'mmo'
@@ -5332,9 +5396,9 @@ section.
 section, are left out from an mmo file.
 
 
-File: ld.info,  Node: MSP430,  Next: PowerPC ELF32,  Prev: MMIX,  Up: Machine Dependent
+File: ld.info,  Node: MSP430,  Next: NDS32,  Prev: MMIX,  Up: Machine Dependent
 
-4.8 'ld' and MSP430
+4.9 'ld' and MSP430
 ===================
 
 For the MSP430 it is possible to select the MPU architecture.  The flag
@@ -5366,10 +5430,77 @@ specific:
      The last two sections are used by gcc.
 
 
-File: ld.info,  Node: PowerPC ELF32,  Next: PowerPC64 ELF64,  Prev: MSP430,  Up: Machine Dependent
+File: ld.info,  Node: NDS32,  Next: Nios II,  Prev: MSP430,  Up: Machine Dependent
 
-4.9 'ld' and PowerPC 32-bit ELF Support
-=======================================
+4.10 'ld' and NDS32
+===================
+
+For NDS32, there are some options to select relaxation behavior.  The
+linker relaxes objects according to these options.
+
+''--m[no-]fp-as-gp''
+     Disable/enable fp-as-gp relaxation.
+
+''--mexport-symbols=FILE''
+     Exporting symbols and their address into FILE as linker script.
+
+''--m[no-]ex9''
+     Disable/enable link-time EX9 relaxation.
+
+''--mexport-ex9=FILE''
+     Export the EX9 table after linking.
+
+''--mimport-ex9=FILE''
+     Import the Ex9 table for EX9 relaxation.
+
+''--mupdate-ex9''
+     Update the existing EX9 table.
+
+''--mex9-limit=NUM''
+     Maximum number of entries in the ex9 table.
+
+''--mex9-loop-aware''
+     Avoid generating the EX9 instruction inside the loop.
+
+''--m[no-]ifc''
+     Disable/enable the link-time IFC optimization.
+
+''--mifc-loop-aware''
+     Avoid generating the IFC instruction inside the loop.
+
+
+File: ld.info,  Node: Nios II,  Next: PowerPC ELF32,  Prev: NDS32,  Up: Machine Dependent
+
+4.11 'ld' and the Altera Nios II
+================================
+
+Call and immediate jump instructions on Nios II processors are limited
+to transferring control to addresses in the same 256MB memory segment,
+which may result in 'ld' giving 'relocation truncated to fit' errors
+with very large programs.  The command-line option '--relax' enables the
+generation of trampolines that can access the entire 32-bit address
+space for calls outside the normal 'call' and 'jmpi' address range.
+These trampolines are inserted at section boundaries, so may not
+themselves be reachable if an input section and its associated call
+trampolines are larger than 256MB.
+
+   The '--relax' option is enabled by default unless '-r' is also
+specified.  You can disable trampoline generation by using the
+'--no-relax' linker option.  You can also disable this optimization
+locally by using the 'set .noat' directive in assembly-language source
+files, as the linker-inserted trampolines use the 'at' register as a
+temporary.
+
+   Note that the linker '--relax' option is independent of assembler
+relaxation options, and that using the GNU assembler's '-relax-all'
+option interferes with the linker's more selective call instruction
+relaxation.
+
+
+File: ld.info,  Node: PowerPC ELF32,  Next: PowerPC64 ELF64,  Prev: Nios II,  Up: Machine Dependent
+
+4.12 'ld' and PowerPC 32-bit ELF Support
+========================================
 
 Branches on PowerPC processors are limited to a signed 26-bit
 displacement, which may result in 'ld' giving 'relocation truncated to
@@ -5424,7 +5555,7 @@ considered potentially out of range, and trampolines inserted.
 
 File: ld.info,  Node: PowerPC64 ELF64,  Next: SPU ELF,  Prev: PowerPC ELF32,  Up: Machine Dependent
 
-4.10 'ld' and PowerPC64 64-bit ELF Support
+4.13 'ld' and PowerPC64 64-bit ELF Support
 ==========================================
 
 '--stub-group-size'
@@ -5545,7 +5676,7 @@ File: ld.info,  Node: PowerPC64 ELF64,  Next: SPU ELF,  Prev: PowerPC ELF32,  Up
 
 File: ld.info,  Node: SPU ELF,  Next: TI COFF,  Prev: PowerPC64 ELF64,  Up: Machine Dependent
 
-4.11 'ld' and SPU ELF Support
+4.14 'ld' and SPU ELF Support
 =============================
 
 '--plugin'
@@ -5601,7 +5732,7 @@ File: ld.info,  Node: SPU ELF,  Next: TI COFF,  Prev: PowerPC64 ELF64,  Up: Mach
 
 File: ld.info,  Node: TI COFF,  Next: WIN32,  Prev: SPU ELF,  Up: Machine Dependent
 
-4.12 'ld''s Support for Various TI COFF Versions
+4.15 'ld''s Support for Various TI COFF Versions
 ================================================
 
 The '--format' switch allows selection of one of the various TI COFF
@@ -5613,7 +5744,7 @@ depends on the default specified by the specific target.
 
 File: ld.info,  Node: WIN32,  Next: Xtensa,  Prev: TI COFF,  Up: Machine Dependent
 
-4.13 'ld' and WIN32 (cygwin/mingw)
+4.16 'ld' and WIN32 (cygwin/mingw)
 ==================================
 
 This section describes some of the win32 specific 'ld' issues.  See
@@ -6039,7 +6170,7 @@ _aligned common symbols_
 
 File: ld.info,  Node: Xtensa,  Prev: WIN32,  Up: Machine Dependent
 
-4.14 'ld' and Xtensa Processors
+4.17 'ld' and Xtensa Processors
 ===============================
 
 The default 'ld' behavior for Xtensa processors is to interpret
@@ -6344,7 +6475,7 @@ contact that organization first.
 individuals in the file 'etc/SERVICE' in the GNU Emacs distribution.
 
    Otherwise, send bug reports for 'ld' to
-<http://www.sourceware.org/bugzilla/ and mailto:hjl.tools@gmail.com>.
+<http://www.sourceware.org/bugzilla/>.
 
    The fundamental principle of reporting bugs usefully is this: *report
 all the facts*.  If you are not sure whether to state a fact or leave it
@@ -7090,244 +7221,252 @@ LD Index
 * Menu:
 
 * ":                                     Symbols.            (line    6)
-* -(:                                    Options.            (line  704)
-* --accept-unknown-input-arch:           Options.            (line  722)
-* --add-needed:                          Options.            (line  749)
-* --add-stdcall-alias:                   Options.            (line 1595)
-* --allow-multiple-definition:           Options.            (line  999)
-* --allow-shlib-undefined:               Options.            (line 1005)
+* -(:                                    Options.            (line  699)
+* --accept-unknown-input-arch:           Options.            (line  717)
+* --add-needed:                          Options.            (line  744)
+* --add-stdcall-alias:                   Options.            (line 1591)
+* --allow-multiple-definition:           Options.            (line  995)
+* --allow-shlib-undefined:               Options.            (line 1001)
 * --architecture=ARCH:                   Options.            (line  122)
-* --as-needed:                           Options.            (line  732)
+* --as-needed:                           Options.            (line  727)
 * --audit AUDITLIB:                      Options.            (line  111)
 * --auxiliary=NAME:                      Options.            (line  254)
-* --bank-window:                         Options.            (line 2022)
-* --base-file:                           Options.            (line 1600)
+* --bank-window:                         Options.            (line 2032)
+* --base-file:                           Options.            (line 1596)
 * --be8:                                 ARM.                (line   28)
 * --bss-plt:                             PowerPC ELF32.      (line   16)
-* --build-id:                            Options.            (line 1557)
-* --build-id=STYLE:                      Options.            (line 1557)
-* --check-sections:                      Options.            (line  827)
-* --copy-dt-needed-entries:              Options.            (line  839)
-* --cref:                                Options.            (line  859)
-* --default-imported-symver:             Options.            (line 1041)
-* --default-script=SCRIPT:               Options.            (line  535)
-* --default-symver:                      Options.            (line 1037)
-* --defsym=SYMBOL=EXP:                   Options.            (line  887)
-* --demangle[=STYLE]:                    Options.            (line  900)
+* --build-id:                            Options.            (line 1553)
+* --build-id=STYLE:                      Options.            (line 1553)
+* --check-sections:                      Options.            (line  822)
+* --copy-dt-needed-entries:              Options.            (line  834)
+* --cref:                                Options.            (line  854)
+* --default-imported-symver:             Options.            (line 1037)
+* --default-script=SCRIPT:               Options.            (line  534)
+* --default-symver:                      Options.            (line 1033)
+* --defsym=SYMBOL=EXP:                   Options.            (line  883)
+* --demangle[=STYLE]:                    Options.            (line  896)
 * --depaudit AUDITLIB:                   Options.            (line  176)
-* --disable-auto-image-base:             Options.            (line 1777)
-* --disable-auto-import:                 Options.            (line 1911)
-* --disable-long-section-names:          Options.            (line 1610)
-* --disable-new-dtags:                   Options.            (line 1519)
-* --disable-runtime-pseudo-reloc:        Options.            (line 1924)
-* --disable-stdcall-fixup:               Options.            (line 1632)
-* --discard-all:                         Options.            (line  581)
-* --discard-locals:                      Options.            (line  585)
-* --dll:                                 Options.            (line 1605)
-* --dll-search-prefix:                   Options.            (line 1783)
+* --disable-auto-image-base:             Options.            (line 1781)
+* --disable-auto-import:                 Options.            (line 1915)
+* --disable-large-address-aware:         Options.            (line 1721)
+* --disable-long-section-names:          Options.            (line 1606)
+* --disable-new-dtags:                   Options.            (line 1515)
+* --disable-runtime-pseudo-reloc:        Options.            (line 1928)
+* --disable-stdcall-fixup:               Options.            (line 1628)
+* --discard-all:                         Options.            (line  580)
+* --discard-locals:                      Options.            (line  584)
+* --dll:                                 Options.            (line 1601)
+* --dll-search-prefix:                   Options.            (line 1787)
 * --dotsyms:                             PowerPC64 ELF64.    (line   33)
-* --dsbt-index:                          Options.            (line 2000)
-* --dsbt-size:                           Options.            (line 1995)
-* --dynamic-linker=FILE:                 Options.            (line  913)
-* --dynamic-list-cpp-new:                Options.            (line  819)
-* --dynamic-list-cpp-typeinfo:           Options.            (line  823)
-* --dynamic-list-data:                   Options.            (line  816)
-* --dynamic-list=DYNAMIC-LIST-FILE:      Options.            (line  803)
-* --dynamicbase:                         Options.            (line 1960)
-* --eh-frame-hdr:                        Options.            (line 1510)
-* --emit-relocs:                         Options.            (line  471)
+* --dsbt-index:                          Options.            (line 2010)
+* --dsbt-size:                           Options.            (line 2005)
+* --dynamic-linker=FILE:                 Options.            (line  909)
+* --dynamic-list-cpp-new:                Options.            (line  814)
+* --dynamic-list-cpp-typeinfo:           Options.            (line  818)
+* --dynamic-list-data:                   Options.            (line  811)
+* --dynamic-list=DYNAMIC-LIST-FILE:      Options.            (line  798)
+* --dynamicbase:                         Options.            (line 1964)
+* --eh-frame-hdr:                        Options.            (line 1506)
+* --emit-relocs:                         Options.            (line  470)
 * --emit-stack-syms:                     SPU ELF.            (line   46)
 * --emit-stub-syms:                      PowerPC ELF32.      (line   47)
 * --emit-stub-syms <1>:                  PowerPC64 ELF64.    (line   29)
 * --emit-stub-syms <2>:                  SPU ELF.            (line   15)
-* --enable-auto-image-base:              Options.            (line 1769)
-* --enable-auto-import:                  Options.            (line 1792)
-* --enable-extra-pe-debug:               Options.            (line 1929)
-* --enable-long-section-names:           Options.            (line 1610)
-* --enable-new-dtags:                    Options.            (line 1519)
-* --enable-runtime-pseudo-reloc:         Options.            (line 1916)
-* --enable-stdcall-fixup:                Options.            (line 1632)
+* --enable-auto-image-base:              Options.            (line 1772)
+* --enable-auto-import:                  Options.            (line 1796)
+* --enable-extra-pe-debug:               Options.            (line 1933)
+* --enable-long-section-names:           Options.            (line 1606)
+* --enable-new-dtags:                    Options.            (line 1515)
+* --enable-runtime-pseudo-reloc:         Options.            (line 1920)
+* --enable-stdcall-fixup:                Options.            (line 1628)
 * --entry=ENTRY:                         Options.            (line  186)
-* --error-unresolved-symbols:            Options.            (line 1463)
-* --exclude-all-symbols:                 Options.            (line 1685)
+* --error-unresolved-symbols:            Options.            (line 1459)
+* --exclude-all-symbols:                 Options.            (line 1681)
 * --exclude-libs:                        Options.            (line  196)
 * --exclude-modules-for-implib:          Options.            (line  207)
-* --exclude-symbols:                     Options.            (line 1679)
-* --export-all-symbols:                  Options.            (line 1655)
+* --exclude-symbols:                     Options.            (line 1675)
+* --export-all-symbols:                  Options.            (line 1651)
 * --export-dynamic:                      Options.            (line  220)
 * --extra-overlay-stubs:                 SPU ELF.            (line   19)
-* --fatal-warnings:                      Options.            (line  920)
-* --file-alignment:                      Options.            (line 1689)
+* --fatal-warnings:                      Options.            (line  916)
+* --file-alignment:                      Options.            (line 1685)
 * --filter=NAME:                         Options.            (line  275)
 * --fix-arm1176:                         ARM.                (line  110)
-* --fix-cortex-a8:                       i960.               (line   40)
+* --fix-cortex-a8:                       ARM.                (line  163)
 * --fix-v4bx:                            ARM.                (line   47)
 * --fix-v4bx-interworking:               ARM.                (line   60)
-* --force-dynamic:                       Options.            (line  480)
-* --force-exe-suffix:                    Options.            (line  925)
-* --forceinteg:                          Options.            (line 1965)
+* --force-dynamic:                       Options.            (line  479)
+* --force-exe-suffix:                    Options.            (line  921)
+* --forceinteg:                          Options.            (line 1969)
 * --format=FORMAT:                       Options.            (line  133)
 * --format=VERSION:                      TI COFF.            (line    6)
-* --gc-sections:                         Options.            (line  935)
-* --got:                                 Options.            (line 2034)
+* --gc-sections:                         Options.            (line  931)
+* --got:                                 Options.            (line 2044)
 * --got=TYPE:                            M68K.               (line    6)
 * --gpsize=VALUE:                        Options.            (line  307)
-* --hash-size=NUMBER:                    Options.            (line 1529)
-* --hash-style=STYLE:                    Options.            (line 1537)
-* --heap:                                Options.            (line 1695)
-* --help:                                Options.            (line  972)
-* --image-base:                          Options.            (line 1702)
-* --just-symbols=FILE:                   Options.            (line  502)
-* --kill-at:                             Options.            (line 1711)
-* --large-address-aware:                 Options.            (line 1716)
-* --ld-generated-unwind-info:            Options.            (line 1514)
-* --leading-underscore:                  Options.            (line 1649)
-* --library-path=DIR:                    Options.            (line  366)
-* --library=NAMESPEC:                    Options.            (line  333)
+* --hash-size=NUMBER:                    Options.            (line 1525)
+* --hash-style=STYLE:                    Options.            (line 1533)
+* --heap:                                Options.            (line 1691)
+* --help:                                Options.            (line  968)
+* --image-base:                          Options.            (line 1698)
+* --insert-timestamp:                    Options.            (line 1992)
+* --insn32:                              Options.            (line 2055)
+* --insn32 <1>:                          MIPS.               (line    6)
+* --just-symbols=FILE:                   Options.            (line  501)
+* --kill-at:                             Options.            (line 1707)
+* --large-address-aware:                 Options.            (line 1712)
+* --ld-generated-unwind-info:            Options.            (line 1510)
+* --leading-underscore:                  Options.            (line 1645)
+* --library-path=DIR:                    Options.            (line  365)
+* --library=NAMESPEC:                    Options.            (line  332)
 * --local-store=lo:hi:                   SPU ELF.            (line   24)
-* --major-image-version:                 Options.            (line 1725)
-* --major-os-version:                    Options.            (line 1730)
-* --major-subsystem-version:             Options.            (line 1734)
-* --merge-exidx-entries:                 i960.               (line   49)
-* --minor-image-version:                 Options.            (line 1739)
-* --minor-os-version:                    Options.            (line 1744)
-* --minor-subsystem-version:             Options.            (line 1748)
+* --long-plt:                            ARM.                (line  175)
+* --major-image-version:                 Options.            (line 1728)
+* --major-os-version:                    Options.            (line 1733)
+* --major-subsystem-version:             Options.            (line 1737)
+* --merge-exidx-entries:                 ARM.                (line  172)
+* --minor-image-version:                 Options.            (line 1742)
+* --minor-os-version:                    Options.            (line 1747)
+* --minor-subsystem-version:             Options.            (line 1751)
 * --mri-script=MRI-CMDFILE:              Options.            (line  157)
 * --multi-subspace:                      HPPA ELF32.         (line    6)
-* --nmagic:                              Options.            (line  434)
-* --no-accept-unknown-input-arch:        Options.            (line  722)
-* --no-add-needed:                       Options.            (line  749)
-* --no-allow-shlib-undefined:            Options.            (line 1005)
-* --no-as-needed:                        Options.            (line  732)
-* --no-bind:                             Options.            (line 1979)
-* --no-check-sections:                   Options.            (line  827)
-* --no-copy-dt-needed-entries:           Options.            (line  839)
-* --no-define-common:                    Options.            (line  871)
-* --no-demangle:                         Options.            (line  900)
+* --nmagic:                              Options.            (line  433)
+* --no-accept-unknown-input-arch:        Options.            (line  717)
+* --no-add-needed:                       Options.            (line  744)
+* --no-allow-shlib-undefined:            Options.            (line 1001)
+* --no-as-needed:                        Options.            (line  727)
+* --no-bind:                             Options.            (line 1983)
+* --no-check-sections:                   Options.            (line  822)
+* --no-copy-dt-needed-entries:           Options.            (line  834)
+* --no-define-common:                    Options.            (line  867)
+* --no-demangle:                         Options.            (line  896)
 * --no-dotsyms:                          PowerPC64 ELF64.    (line   33)
 * --no-enum-size-warning:                ARM.                (line  119)
 * --no-export-dynamic:                   Options.            (line  220)
-* --no-fatal-warnings:                   Options.            (line  920)
+* --no-fatal-warnings:                   Options.            (line  916)
 * --no-fix-arm1176:                      ARM.                (line  110)
-* --no-fix-cortex-a8:                    i960.               (line   40)
-* --no-gc-sections:                      Options.            (line  935)
-* --no-isolation:                        Options.            (line 1972)
-* --no-keep-memory:                      Options.            (line  984)
-* --no-leading-underscore:               Options.            (line 1649)
-* --no-merge-exidx-entries:              Options.            (line 2007)
-* --no-merge-exidx-entries <1>:          i960.               (line   49)
+* --no-fix-cortex-a8:                    ARM.                (line  163)
+* --no-gc-sections:                      Options.            (line  931)
+* --no-insn32:                           Options.            (line 2056)
+* --no-insn32 <1>:                       MIPS.               (line    6)
+* --no-isolation:                        Options.            (line 1976)
+* --no-keep-memory:                      Options.            (line  980)
+* --no-leading-underscore:               Options.            (line 1645)
+* --no-merge-exidx-entries:              Options.            (line 2017)
+* --no-merge-exidx-entries <1>:          ARM.                (line  172)
 * --no-multi-toc:                        PowerPC64 ELF64.    (line   74)
-* --no-omagic:                           Options.            (line  449)
+* --no-omagic:                           Options.            (line  448)
 * --no-opd-optimize:                     PowerPC64 ELF64.    (line   48)
 * --no-overlays:                         SPU ELF.            (line    9)
 * --no-plt-align:                        PowerPC64 ELF64.    (line   96)
 * --no-plt-static-chain:                 PowerPC64 ELF64.    (line  103)
 * --no-plt-thread-safe:                  PowerPC64 ELF64.    (line  109)
-* --no-print-gc-sections:                Options.            (line  957)
-* --no-seh:                              Options.            (line 1975)
+* --no-print-gc-sections:                Options.            (line  953)
+* --no-seh:                              Options.            (line 1979)
 * --no-tls-optimize:                     PowerPC ELF32.      (line   51)
 * --no-tls-optimize <1>:                 PowerPC64 ELF64.    (line   43)
 * --no-toc-optimize:                     PowerPC64 ELF64.    (line   60)
 * --no-toc-sort:                         PowerPC64 ELF64.    (line   86)
-* --no-trampoline:                       Options.            (line 2016)
-* --no-undefined:                        Options.            (line  991)
-* --no-undefined-version:                Options.            (line 1032)
-* --no-warn-mismatch:                    Options.            (line 1045)
-* --no-warn-search-mismatch:             Options.            (line 1054)
+* --no-trampoline:                       Options.            (line 2026)
+* --no-undefined:                        Options.            (line  987)
+* --no-undefined-version:                Options.            (line 1028)
+* --no-warn-mismatch:                    Options.            (line 1041)
+* --no-warn-search-mismatch:             Options.            (line 1050)
 * --no-wchar-size-warning:               ARM.                (line  126)
-* --no-whole-archive:                    Options.            (line 1058)
-* --noinhibit-exec:                      Options.            (line 1062)
+* --no-whole-archive:                    Options.            (line 1054)
+* --noinhibit-exec:                      Options.            (line 1058)
 * --non-overlapping-opd:                 PowerPC64 ELF64.    (line   54)
-* --nxcompat:                            Options.            (line 1968)
-* --oformat=OUTPUT-FORMAT:               Options.            (line 1073)
-* --omagic:                              Options.            (line  440)
-* --out-implib:                          Options.            (line 1761)
-* --output-def:                          Options.            (line 1753)
-* --output=OUTPUT:                       Options.            (line  455)
-* --pic-executable:                      Options.            (line 1086)
+* --nxcompat:                            Options.            (line 1972)
+* --oformat=OUTPUT-FORMAT:               Options.            (line 1069)
+* --omagic:                              Options.            (line  439)
+* --out-implib:                          Options.            (line 1764)
+* --output-def:                          Options.            (line 1756)
+* --output=OUTPUT:                       Options.            (line  454)
+* --pic-executable:                      Options.            (line 1082)
 * --pic-veneer:                          ARM.                (line  132)
 * --plt-align:                           PowerPC64 ELF64.    (line   96)
 * --plt-static-chain:                    PowerPC64 ELF64.    (line  103)
 * --plt-thread-safe:                     PowerPC64 ELF64.    (line  109)
 * --plugin:                              SPU ELF.            (line    6)
-* --print-gc-sections:                   Options.            (line  957)
-* --print-map:                           Options.            (line  400)
-* --print-output-format:                 Options.            (line  966)
-* --reduce-memory-overheads:             Options.            (line 1543)
-* --relax:                               Options.            (line 1102)
+* --print-gc-sections:                   Options.            (line  953)
+* --print-map:                           Options.            (line  399)
+* --print-output-format:                 Options.            (line  962)
+* --reduce-memory-overheads:             Options.            (line 1539)
+* --relax:                               Options.            (line 1098)
 * '--relax' on i960:                     i960.               (line   32)
+* --relax on Nios II:                    Nios II.            (line    6)
 * --relax on PowerPC:                    PowerPC ELF32.      (line    6)
 * '--relax' on Xtensa:                   Xtensa.             (line   27)
-* --relocatable:                         Options.            (line  484)
-* --retain-symbols-file=FILENAME:        Options.            (line 1128)
-* --script=SCRIPT:                       Options.            (line  526)
+* --relocatable:                         Options.            (line  483)
+* --retain-symbols-file=FILENAME:        Options.            (line 1124)
+* --script=SCRIPT:                       Options.            (line  525)
 * --sdata-got:                           PowerPC ELF32.      (line   33)
-* --section-alignment:                   Options.            (line 1934)
-* --section-start=SECTIONNAME=ORG:       Options.            (line 1277)
+* --section-alignment:                   Options.            (line 1938)
+* --section-start=SECTIONNAME=ORG:       Options.            (line 1273)
 * --secure-plt:                          PowerPC ELF32.      (line   26)
-* --sort-common:                         Options.            (line 1219)
-* --sort-section=alignment:              Options.            (line 1234)
-* --sort-section=name:                   Options.            (line 1230)
-* --split-by-file:                       Options.            (line 1238)
-* --split-by-reloc:                      Options.            (line 1243)
-* --stack:                               Options.            (line 1940)
+* --sort-common:                         Options.            (line 1215)
+* --sort-section=alignment:              Options.            (line 1230)
+* --sort-section=name:                   Options.            (line 1226)
+* --split-by-file:                       Options.            (line 1234)
+* --split-by-reloc:                      Options.            (line 1239)
+* --stack:                               Options.            (line 1944)
 * --stack-analysis:                      SPU ELF.            (line   29)
-* --stats:                               Options.            (line 1256)
-* --strip-all:                           Options.            (line  513)
-* --strip-debug:                         Options.            (line  517)
+* --stats:                               Options.            (line 1252)
+* --strip-all:                           Options.            (line  512)
+* --strip-debug:                         Options.            (line  516)
 * --stub-group-size:                     PowerPC64 ELF64.    (line    6)
 * --stub-group-size=N:                   ARM.                (line  137)
 * --stub-group-size=N <1>:               HPPA ELF32.         (line   12)
-* --subsystem:                           Options.            (line 1947)
+* --subsystem:                           Options.            (line 1951)
 * --support-old-code:                    ARM.                (line    6)
-* --sysroot=DIRECTORY:                   Options.            (line 1260)
-* --target-help:                         Options.            (line  976)
+* --sysroot=DIRECTORY:                   Options.            (line 1256)
+* --target-help:                         Options.            (line  972)
 * --target1-abs:                         ARM.                (line   32)
 * --target1-rel:                         ARM.                (line   32)
 * --target2=TYPE:                        ARM.                (line   37)
 * --thumb-entry=ENTRY:                   ARM.                (line   17)
-* --trace:                               Options.            (line  522)
-* --trace-symbol=SYMBOL:                 Options.            (line  591)
-* --traditional-format:                  Options.            (line 1265)
-* --tsaware:                             Options.            (line 1985)
-* --undefined=SYMBOL:                    Options.            (line  548)
-* --unique[=SECTION]:                    Options.            (line  566)
-* --unresolved-symbols:                  Options.            (line 1307)
+* --trace:                               Options.            (line  521)
+* --trace-symbol=SYMBOL:                 Options.            (line  590)
+* --traditional-format:                  Options.            (line 1261)
+* --tsaware:                             Options.            (line 1989)
+* --undefined=SYMBOL:                    Options.            (line  547)
+* --unique[=SECTION]:                    Options.            (line  565)
+* --unresolved-symbols:                  Options.            (line 1303)
 * --use-blx:                             ARM.                (line   72)
 * --use-nul-prefixed-import-tables:      ARM.                (line   23)
-* --verbose[=NUMBER]:                    Options.            (line 1336)
-* --version:                             Options.            (line  575)
-* --version-script=VERSION-SCRIPTFILE:   Options.            (line 1344)
+* --verbose[=NUMBER]:                    Options.            (line 1332)
+* --version:                             Options.            (line  574)
+* --version-script=VERSION-SCRIPTFILE:   Options.            (line 1340)
 * --vfp11-denorm-fix:                    ARM.                (line   81)
-* --warn-alternate-em:                   Options.            (line 1455)
-* --warn-common:                         Options.            (line 1354)
-* --warn-constructors:                   Options.            (line 1422)
-* --warn-multiple-gp:                    Options.            (line 1427)
-* --warn-once:                           Options.            (line 1441)
-* --warn-section-align:                  Options.            (line 1445)
-* --warn-shared-textrel:                 Options.            (line 1452)
-* --warn-unresolved-symbols:             Options.            (line 1458)
-* --wdmdriver:                           Options.            (line 1982)
-* --whole-archive:                       Options.            (line 1467)
-* --wrap=SYMBOL:                         Options.            (line 1481)
+* --warn-alternate-em:                   Options.            (line 1451)
+* --warn-common:                         Options.            (line 1350)
+* --warn-constructors:                   Options.            (line 1418)
+* --warn-multiple-gp:                    Options.            (line 1423)
+* --warn-once:                           Options.            (line 1437)
+* --warn-section-align:                  Options.            (line 1441)
+* --warn-shared-textrel:                 Options.            (line 1448)
+* --warn-unresolved-symbols:             Options.            (line 1454)
+* --wdmdriver:                           Options.            (line 1986)
+* --whole-archive:                       Options.            (line 1463)
+* --wrap=SYMBOL:                         Options.            (line 1477)
 * -A ARCH:                               Options.            (line  121)
 * -a KEYWORD:                            Options.            (line  104)
-* -assert KEYWORD:                       Options.            (line  756)
+* -assert KEYWORD:                       Options.            (line  751)
 * -b FORMAT:                             Options.            (line  133)
-* -Bdynamic:                             Options.            (line  759)
-* -Bgroup:                               Options.            (line  769)
-* -Bshareable:                           Options.            (line 1212)
-* -Bstatic:                              Options.            (line  776)
-* -Bsymbolic:                            Options.            (line  790)
-* -Bsymbolic-functions:                  Options.            (line  797)
+* -Bdynamic:                             Options.            (line  754)
+* -Bgroup:                               Options.            (line  764)
+* -Bshareable:                           Options.            (line 1208)
+* -Bstatic:                              Options.            (line  771)
+* -Bsymbolic:                            Options.            (line  785)
+* -Bsymbolic-functions:                  Options.            (line  792)
 * -c MRI-CMDFILE:                        Options.            (line  157)
-* -call_shared:                          Options.            (line  759)
+* -call_shared:                          Options.            (line  754)
 * -d:                                    Options.            (line  167)
 * -dc:                                   Options.            (line  167)
-* -dn:                                   Options.            (line  776)
+* -dn:                                   Options.            (line  771)
 * -dp:                                   Options.            (line  167)
-* -dT SCRIPT:                            Options.            (line  535)
-* -dy:                                   Options.            (line  759)
+* -dT SCRIPT:                            Options.            (line  534)
+* -dy:                                   Options.            (line  754)
 * -E:                                    Options.            (line  220)
 * -e ENTRY:                              Options.            (line  186)
 * -EB:                                   Options.            (line  247)
@@ -7337,58 +7476,59 @@ LD Index
 * -fini=NAME:                            Options.            (line  298)
 * -g:                                    Options.            (line  304)
 * -G VALUE:                              Options.            (line  307)
-* -h NAME:                               Options.            (line  315)
-* -i:                                    Options.            (line  324)
-* -IFILE:                                Options.            (line  913)
-* -init=NAME:                            Options.            (line  327)
-* -L DIR:                                Options.            (line  366)
-* -l NAMESPEC:                           Options.            (line  333)
-* -M:                                    Options.            (line  400)
-* -m EMULATION:                          Options.            (line  390)
-* -Map=MAPFILE:                          Options.            (line  980)
-* -n:                                    Options.            (line  434)
-* -N:                                    Options.            (line  440)
-* -no-relax:                             Options.            (line 1102)
-* -non_shared:                           Options.            (line  776)
-* -nostdlib:                             Options.            (line 1068)
-* -O LEVEL:                              Options.            (line  461)
-* -o OUTPUT:                             Options.            (line  455)
+* -h NAME:                               Options.            (line  314)
+* -i:                                    Options.            (line  323)
+* -IFILE:                                Options.            (line  909)
+* -init=NAME:                            Options.            (line  326)
+* -L DIR:                                Options.            (line  365)
+* -l NAMESPEC:                           Options.            (line  332)
+* -M:                                    Options.            (line  399)
+* -m EMULATION:                          Options.            (line  389)
+* -Map=MAPFILE:                          Options.            (line  976)
+* -n:                                    Options.            (line  433)
+* -N:                                    Options.            (line  439)
+* -no-relax:                             Options.            (line 1098)
+* -non_shared:                           Options.            (line  771)
+* -nostdlib:                             Options.            (line 1064)
+* -O LEVEL:                              Options.            (line  460)
+* -o OUTPUT:                             Options.            (line  454)
 * -P AUDITLIB:                           Options.            (line  176)
-* -pie:                                  Options.            (line 1086)
-* -q:                                    Options.            (line  471)
-* -qmagic:                               Options.            (line 1096)
-* -Qy:                                   Options.            (line 1099)
-* -r:                                    Options.            (line  484)
-* -R FILE:                               Options.            (line  502)
-* -rpath-link=DIR:                       Options.            (line 1164)
-* -rpath=DIR:                            Options.            (line 1142)
-* -s:                                    Options.            (line  513)
-* -S:                                    Options.            (line  517)
-* -shared:                               Options.            (line 1212)
-* -soname=NAME:                          Options.            (line  315)
-* -static:                               Options.            (line  776)
-* -t:                                    Options.            (line  522)
-* -T SCRIPT:                             Options.            (line  526)
-* -Tbss=ORG:                             Options.            (line 1286)
-* -Tdata=ORG:                            Options.            (line 1286)
-* -Tldata-segment=ORG:                   Options.            (line 1302)
-* -Trodata-segment=ORG:                  Options.            (line 1296)
-* -Ttext-segment=ORG:                    Options.            (line 1292)
-* -Ttext=ORG:                            Options.            (line 1286)
-* -u SYMBOL:                             Options.            (line  548)
-* -Ur:                                   Options.            (line  556)
-* -v:                                    Options.            (line  575)
-* -V:                                    Options.            (line  575)
-* -x:                                    Options.            (line  581)
-* -X:                                    Options.            (line  585)
-* -Y PATH:                               Options.            (line  600)
-* -y SYMBOL:                             Options.            (line  591)
-* -z defs:                               Options.            (line  991)
-* -z KEYWORD:                            Options.            (line  604)
-* -z muldefs:                            Options.            (line  999)
+* -pie:                                  Options.            (line 1082)
+* -q:                                    Options.            (line  470)
+* -qmagic:                               Options.            (line 1092)
+* -Qy:                                   Options.            (line 1095)
+* -r:                                    Options.            (line  483)
+* -R FILE:                               Options.            (line  501)
+* -rpath-link=DIR:                       Options.            (line 1160)
+* -rpath=DIR:                            Options.            (line 1138)
+* -s:                                    Options.            (line  512)
+* -S:                                    Options.            (line  516)
+* -shared:                               Options.            (line 1208)
+* -soname=NAME:                          Options.            (line  314)
+* -static:                               Options.            (line  771)
+* -t:                                    Options.            (line  521)
+* -T SCRIPT:                             Options.            (line  525)
+* -Tbss=ORG:                             Options.            (line 1282)
+* -Tdata=ORG:                            Options.            (line 1282)
+* -Tldata-segment=ORG:                   Options.            (line 1298)
+* -Trodata-segment=ORG:                  Options.            (line 1292)
+* -Ttext-segment=ORG:                    Options.            (line 1288)
+* -Ttext=ORG:                            Options.            (line 1282)
+* -u SYMBOL:                             Options.            (line  547)
+* -Ur:                                   Options.            (line  555)
+* -v:                                    Options.            (line  574)
+* -V:                                    Options.            (line  574)
+* -x:                                    Options.            (line  580)
+* -X:                                    Options.            (line  584)
+* -Y PATH:                               Options.            (line  599)
+* -y SYMBOL:                             Options.            (line  590)
+* -z defs:                               Options.            (line  987)
+* -z KEYWORD:                            Options.            (line  603)
+* -z muldefs:                            Options.            (line  995)
 * .:                                     Location Counter.   (line    6)
 * /DISCARD/:                             Output Section Discarding.
-                                                             (line   21)
+                                                             (line   26)
+* 32-bit PLT entries:                    ARM.                (line  175)
 * :PHDR:                                 Output Section Phdr.
                                                              (line    6)
 * =FILLEXP:                              Output Section Fill.
@@ -7418,7 +7558,7 @@ LD Index
 * architecture:                          Miscellaneous Commands.
                                                              (line   72)
 * architectures:                         Options.            (line  121)
-* archive files, from cmd line:          Options.            (line  333)
+* archive files, from cmd line:          Options.            (line  332)
 * archive search path in linker script:  File Commands.      (line   74)
 * arithmetic:                            Expressions.        (line    6)
 * arithmetic operators:                  Operators.          (line    6)
@@ -7450,11 +7590,11 @@ LD Index
                                                              (line   19)
 * 'CHIP' (MRI):                          MRI.                (line   57)
 * COLLECT_NO_DEMANGLE:                   Environment.        (line   29)
-* combining symbols, warnings on:        Options.            (line 1354)
+* combining symbols, warnings on:        Options.            (line 1350)
 * command files:                         Scripts.            (line    6)
 * command line:                          Options.            (line    6)
 * common allocation:                     Options.            (line  167)
-* common allocation <1>:                 Options.            (line  871)
+* common allocation <1>:                 Options.            (line  867)
 * common allocation in linker script:    Miscellaneous Commands.
                                                              (line   20)
 * common allocation in linker script <1>: Miscellaneous Commands.
@@ -7467,17 +7607,17 @@ LD Index
 * constants in linker scripts:           Constants.          (line    6)
 * constraints on output sections:        Output Section Constraint.
                                                              (line    6)
-* constructors:                          Options.            (line  556)
+* constructors:                          Options.            (line  555)
 * CONSTRUCTORS:                          Output Section Keywords.
                                                              (line   19)
 * constructors, arranging in link:       Output Section Keywords.
                                                              (line   19)
-* Cortex-A8 erratum workaround:          i960.               (line   40)
+* Cortex-A8 erratum workaround:          ARM.                (line  163)
 * crash of linker:                       Bug Criteria.       (line    9)
 * CREATE_OBJECT_SYMBOLS:                 Output Section Keywords.
                                                              (line    9)
 * creating a DEF file:                   WIN32.              (line  153)
-* cross reference table:                 Options.            (line  859)
+* cross reference table:                 Options.            (line  854)
 * cross references:                      Miscellaneous Commands.
                                                              (line   56)
 * current output location:               Location Counter.   (line    6)
@@ -7487,29 +7627,29 @@ LD Index
                                                              (line   81)
 * DATA_SEGMENT_END(EXP):                 Builtin Functions.  (line  102)
 * DATA_SEGMENT_RELRO_END(OFFSET, EXP):   Builtin Functions.  (line  108)
-* dbx:                                   Options.            (line 1270)
-* DEF files, creating:                   Options.            (line 1753)
+* dbx:                                   Options.            (line 1266)
+* DEF files, creating:                   Options.            (line 1756)
 * default emulation:                     Environment.        (line   21)
 * default input format:                  Environment.        (line    9)
-* DEFINED(SYMBOL):                       Builtin Functions.  (line  119)
-* deleting local symbols:                Options.            (line  581)
+* DEFINED(SYMBOL):                       Builtin Functions.  (line  121)
+* deleting local symbols:                Options.            (line  580)
 * demangling, default:                   Environment.        (line   29)
-* demangling, from command line:         Options.            (line  900)
+* demangling, from command line:         Options.            (line  896)
 * direct linking to a dll:               WIN32.              (line  233)
 * discarding sections:                   Output Section Discarding.
                                                              (line    6)
 * discontinuous memory:                  MEMORY.             (line    6)
-* DLLs, creating:                        Options.            (line 1655)
-* DLLs, creating <1>:                    Options.            (line 1753)
-* DLLs, creating <2>:                    Options.            (line 1761)
-* DLLs, linking to:                      Options.            (line 1783)
+* DLLs, creating:                        Options.            (line 1651)
+* DLLs, creating <1>:                    Options.            (line 1756)
+* DLLs, creating <2>:                    Options.            (line 1764)
+* DLLs, linking to:                      Options.            (line 1787)
 * dot:                                   Location Counter.   (line    6)
 * dot inside sections:                   Location Counter.   (line   36)
 * dot outside sections:                  Location Counter.   (line   66)
-* dynamic linker, from command line:     Options.            (line  913)
+* dynamic linker, from command line:     Options.            (line  909)
 * dynamic symbol table:                  Options.            (line  220)
 * ELF program headers:                   PHDRS.              (line    6)
-* emulation:                             Options.            (line  390)
+* emulation:                             Options.            (line  389)
 * emulation, default:                    Environment.        (line   21)
 * 'END' (MRI):                           MRI.                (line   61)
 * endianness:                            Options.            (line  247)
@@ -7547,22 +7687,22 @@ LD Index
                                                              (line    6)
 * forcing output section alignment:      Forced Output Alignment.
                                                              (line    6)
-* forcing the creation of dynamic sections: Options.         (line  480)
+* forcing the creation of dynamic sections: Options.         (line  479)
 * 'FORMAT' (MRI):                        MRI.                (line   65)
 * functions in expressions:              Builtin Functions.  (line    6)
-* garbage collection:                    Options.            (line  935)
-* garbage collection <1>:                Options.            (line  957)
+* garbage collection:                    Options.            (line  931)
+* garbage collection <1>:                Options.            (line  953)
 * garbage collection <2>:                Input Section Keep. (line    6)
-* generating optimized output:           Options.            (line  461)
+* generating optimized output:           Options.            (line  460)
 * GNU linker:                            Overview.           (line    6)
 * GNUTARGET:                             Environment.        (line    9)
 * GROUP(FILES):                          File Commands.      (line   47)
 * grouping input files:                  File Commands.      (line   47)
-* groups of archives:                    Options.            (line  704)
+* groups of archives:                    Options.            (line  699)
 * H8/300 support:                        H8/300.             (line    6)
-* header size:                           Builtin Functions.  (line  182)
-* heap size:                             Options.            (line 1695)
-* help:                                  Options.            (line  972)
+* header size:                           Builtin Functions.  (line  188)
+* heap size:                             Options.            (line 1691)
+* help:                                  Options.            (line  968)
 * HIDDEN:                                HIDDEN.             (line    6)
 * holes:                                 Location Counter.   (line   12)
 * holes, filling:                        Output Section Data.
@@ -7570,23 +7710,23 @@ LD Index
 * HPPA multiple sub-space stubs:         HPPA ELF32.         (line    6)
 * HPPA stub grouping:                    HPPA ELF32.         (line   12)
 * i960 support:                          i960.               (line    6)
-* image base:                            Options.            (line 1702)
+* image base:                            Options.            (line 1698)
 * implicit linker scripts:               Implicit Linker Scripts.
                                                              (line    6)
 * import libraries:                      WIN32.              (line   10)
 * INCLUDE FILENAME:                      File Commands.      (line    9)
 * including a linker script:             File Commands.      (line    9)
-* including an entire archive:           Options.            (line 1467)
-* incremental link:                      Options.            (line  324)
+* including an entire archive:           Options.            (line 1463)
+* incremental link:                      Options.            (line  323)
 * INHIBIT_COMMON_ALLOCATION:             Miscellaneous Commands.
                                                              (line   25)
-* initialization function:               Options.            (line  327)
+* initialization function:               Options.            (line  326)
 * initialized data in ROM:               Output Section LMA. (line   39)
 * input file format in linker script:    Format Commands.    (line   35)
 * input filename symbols:                Output Section Keywords.
                                                              (line    9)
 * input files in linker scripts:         File Commands.      (line   19)
-* input files, displaying:               Options.            (line  522)
+* input files, displaying:               Options.            (line  521)
 * input format:                          Options.            (line  133)
 * input format <1>:                      Options.            (line  133)
 * input object files in linker scripts:  File Commands.      (line   19)
@@ -7611,16 +7751,16 @@ LD Index
 * l =:                                   MEMORY.             (line   68)
 * lazy evaluation:                       Evaluation.         (line    6)
 * 'ld' bugs, reporting:                  Bug Reporting.      (line    6)
-* ldata segment origin, cmd line:        Options.            (line 1303)
+* ldata segment origin, cmd line:        Options.            (line 1299)
 * LDEMULATION:                           Environment.        (line   21)
 * LD_FEATURE(STRING):                    Miscellaneous Commands.
                                                              (line   78)
 * len =:                                 MEMORY.             (line   68)
 * LENGTH =:                              MEMORY.             (line   68)
-* LENGTH(MEMORY):                        Builtin Functions.  (line  136)
+* LENGTH(MEMORY):                        Builtin Functions.  (line  138)
 * library search path in linker script:  File Commands.      (line   74)
-* link map:                              Options.            (line  400)
-* link-time runtime library search path: Options.            (line 1164)
+* link map:                              Options.            (line  399)
+* link-time runtime library search path: Options.            (line 1160)
 * linker crash:                          Bug Criteria.       (line    9)
 * linker script concepts:                Basic Script Concepts.
                                                              (line    6)
@@ -7634,11 +7774,12 @@ LD Index
 * little-endian objects:                 Options.            (line  250)
 * 'LOAD' (MRI):                          MRI.                (line   83)
 * load address:                          Output Section LMA. (line    6)
-* LOADADDR(SECTION):                     Builtin Functions.  (line  139)
+* LOADADDR(SECTION):                     Builtin Functions.  (line  141)
 * loading, preventing:                   Output Section Type.
                                                              (line   21)
-* local symbols, deleting:               Options.            (line  585)
+* local symbols, deleting:               Options.            (line  584)
 * location counter:                      Location Counter.   (line    6)
+* LOG2CEIL(EXP):                         Builtin Functions.  (line  145)
 * LONG(EXPRESSION):                      Output Section Data.
                                                              (line    6)
 * M and K integer suffixes:              Constants.          (line   15)
@@ -7647,15 +7788,17 @@ LD Index
                                                              (line   72)
 * machine dependencies:                  Machine Dependent.  (line    6)
 * mapping input sections to output sections: Input Section.  (line    6)
-* MAX:                                   Builtin Functions.  (line  142)
+* MAX:                                   Builtin Functions.  (line  148)
 * MAXPAGESIZE:                           Symbolic Constants. (line   10)
 * MEMORY:                                MEMORY.             (line    6)
 * memory region attributes:              MEMORY.             (line   34)
 * memory regions:                        MEMORY.             (line    6)
 * memory regions and sections:           Output Section Region.
                                                              (line    6)
-* memory usage:                          Options.            (line  984)
-* MIN:                                   Builtin Functions.  (line  145)
+* memory usage:                          Options.            (line  980)
+* Merging exidx entries:                 ARM.                (line  172)
+* MIN:                                   Builtin Functions.  (line  151)
+* MIPS microMIPS instruction choice selection: MIPS.         (line    6)
 * Motorola 68K GOT generation:           M68K.               (line    6)
 * MRI compatibility:                     MRI.                (line    6)
 * MSP430 extra sections:                 MSP430.             (line   11)
@@ -7663,14 +7806,15 @@ LD Index
 * name, section:                         Output Section Name.
                                                              (line    6)
 * names:                                 Symbols.            (line    6)
-* naming the output file:                Options.            (line  455)
-* NEXT(EXP):                             Builtin Functions.  (line  149)
-* NMAGIC:                                Options.            (line  434)
+* naming the output file:                Options.            (line  454)
+* NEXT(EXP):                             Builtin Functions.  (line  155)
+* Nios II call relaxation:               Nios II.            (line    6)
+* NMAGIC:                                Options.            (line  433)
 * NOCROSSREFS(SECTIONS):                 Miscellaneous Commands.
                                                              (line   56)
 * NOLOAD:                                Output Section Type.
                                                              (line   21)
-* not enough room for program headers:   Builtin Functions.  (line  187)
+* not enough room for program headers:   Builtin Functions.  (line  193)
 * NO_ENUM_SIZE_WARNING:                  ARM.                (line  119)
 * NO_WCHAR_SIZE_WARNING:                 ARM.                (line  126)
 * o =:                                   MEMORY.             (line   63)
@@ -7679,8 +7823,8 @@ LD Index
 * object files:                          Options.            (line   29)
 * object formats available:              BFD.                (line    6)
 * object size:                           Options.            (line  307)
-* OMAGIC:                                Options.            (line  440)
-* OMAGIC <1>:                            Options.            (line  449)
+* OMAGIC:                                Options.            (line  439)
+* OMAGIC <1>:                            Options.            (line  448)
 * ONLY_IF_RO:                            Output Section Constraint.
                                                              (line    6)
 * ONLY_IF_RW:                            Output Section Constraint.
@@ -7691,12 +7835,12 @@ LD Index
 * 'ORDER' (MRI):                         MRI.                (line   94)
 * org =:                                 MEMORY.             (line   63)
 * ORIGIN =:                              MEMORY.             (line   63)
-* ORIGIN(MEMORY):                        Builtin Functions.  (line  155)
+* ORIGIN(MEMORY):                        Builtin Functions.  (line  161)
 * orphan:                                Orphan Sections.    (line    6)
-* output file after errors:              Options.            (line 1062)
+* output file after errors:              Options.            (line 1058)
 * output file format in linker script:   Format Commands.    (line   10)
 * output file name in linker script:     File Commands.      (line   64)
-* output format:                         Options.            (line  966)
+* output format:                         Options.            (line  962)
 * output section alignment:              Forced Output Alignment.
                                                              (line    6)
 * output section attributes:             Output Section Attributes.
@@ -7711,12 +7855,12 @@ LD Index
                                                              (line    6)
 * overlays:                              Overlay Description.
                                                              (line    6)
-* partial link:                          Options.            (line  484)
+* partial link:                          Options.            (line  483)
 * PE import table prefixing:             ARM.                (line   23)
 * PHDRS:                                 PHDRS.              (line    6)
 * PHDRS <1>:                             PHDRS.              (line   62)
 * PIC_VENEER:                            ARM.                (line  132)
-* position independent executables:      Options.            (line 1088)
+* position independent executables:      Options.            (line 1084)
 * PowerPC ELF32 options:                 PowerPC ELF32.      (line   16)
 * PowerPC GOT:                           PowerPC ELF32.      (line   33)
 * PowerPC long branches:                 PowerPC ELF32.      (line    6)
@@ -7742,7 +7886,7 @@ LD Index
 * program headers:                       PHDRS.              (line    6)
 * program headers and sections:          Output Section Phdr.
                                                              (line    6)
-* program headers, not enough room:      Builtin Functions.  (line  187)
+* program headers, not enough room:      Builtin Functions.  (line  193)
 * program segments:                      PHDRS.              (line    6)
 * PROVIDE:                               PROVIDE.            (line    6)
 * PROVIDE_HIDDEN:                        PROVIDE_HIDDEN.     (line    6)
@@ -7750,40 +7894,41 @@ LD Index
 * QUAD(EXPRESSION):                      Output Section Data.
                                                              (line    6)
 * quoted symbol names:                   Symbols.            (line    6)
-* read-only text:                        Options.            (line  434)
-* read/write from cmd line:              Options.            (line  440)
+* read-only text:                        Options.            (line  433)
+* read/write from cmd line:              Options.            (line  439)
 * region alias:                          REGION_ALIAS.       (line    6)
 * region names:                          REGION_ALIAS.       (line    6)
 * regions of memory:                     MEMORY.             (line    6)
 * REGION_ALIAS(ALIAS, REGION):           REGION_ALIAS.       (line    6)
 * relative expressions:                  Expression Section. (line    6)
-* relaxing addressing modes:             Options.            (line 1102)
+* relaxing addressing modes:             Options.            (line 1098)
 * relaxing on H8/300:                    H8/300.             (line    9)
 * relaxing on i960:                      i960.               (line   32)
 * relaxing on M68HC11:                   M68HC11/68HC12.     (line   12)
+* relaxing on NDS32:                     NDS32.              (line    6)
 * relaxing on Xtensa:                    Xtensa.             (line   27)
 * relocatable and absolute symbols:      Expression Section. (line    6)
-* relocatable output:                    Options.            (line  484)
+* relocatable output:                    Options.            (line  483)
 * removing sections:                     Output Section Discarding.
                                                              (line    6)
 * reporting bugs in 'ld':                Reporting Bugs.     (line    6)
 * requirements for BFD:                  BFD.                (line   16)
-* retain relocations in final executable: Options.           (line  471)
-* retaining specified symbols:           Options.            (line 1128)
-* rodata segment origin, cmd line:       Options.            (line 1297)
+* retain relocations in final executable: Options.           (line  470)
+* retaining specified symbols:           Options.            (line 1124)
+* rodata segment origin, cmd line:       Options.            (line 1293)
 * ROM initialized data:                  Output Section LMA. (line   39)
 * round up expression:                   Builtin Functions.  (line   38)
 * round up location counter:             Builtin Functions.  (line   38)
-* runtime library name:                  Options.            (line  315)
-* runtime library search path:           Options.            (line 1142)
+* runtime library name:                  Options.            (line  314)
+* runtime library search path:           Options.            (line 1138)
 * runtime pseudo-relocation:             WIN32.              (line  211)
 * scaled integers:                       Constants.          (line   15)
 * scommon section:                       Input Section Common.
                                                              (line   20)
-* script files:                          Options.            (line  526)
-* script files <1>:                      Options.            (line  535)
+* script files:                          Options.            (line  525)
+* script files <1>:                      Options.            (line  534)
 * scripts:                               Scripts.            (line    6)
-* search directory, from cmd line:       Options.            (line  366)
+* search directory, from cmd line:       Options.            (line  365)
 * search path in linker script:          File Commands.      (line   74)
 * SEARCH_DIR(PATH):                      File Commands.      (line   74)
 * 'SECT' (MRI):                          MRI.                (line  108)
@@ -7791,18 +7936,18 @@ LD Index
                                                              (line    6)
 * section address in expression:         Builtin Functions.  (line   17)
 * section alignment:                     Builtin Functions.  (line   63)
-* section alignment, warnings on:        Options.            (line 1445)
+* section alignment, warnings on:        Options.            (line 1441)
 * section data:                          Output Section Data.
                                                              (line    6)
 * section fill pattern:                  Output Section Fill.
                                                              (line    6)
 * section load address:                  Output Section LMA. (line    6)
-* section load address in expression:    Builtin Functions.  (line  139)
+* section load address in expression:    Builtin Functions.  (line  141)
 * section name:                          Output Section Name.
                                                              (line    6)
 * section name wildcard patterns:        Input Section Wildcards.
                                                              (line    6)
-* section size:                          Builtin Functions.  (line  166)
+* section size:                          Builtin Functions.  (line  172)
 * section, assigning to memory region:   Output Section Region.
                                                              (line    6)
 * section, assigning to program header:  Output Section Phdr.
@@ -7810,26 +7955,26 @@ LD Index
 * SECTIONS:                              SECTIONS.           (line    6)
 * sections, discarding:                  Output Section Discarding.
                                                              (line    6)
-* segment origins, cmd line:             Options.            (line 1286)
+* segment origins, cmd line:             Options.            (line 1282)
 * segments, ELF:                         PHDRS.              (line    6)
-* SEGMENT_START(SEGMENT, DEFAULT):       Builtin Functions.  (line  158)
-* shared libraries:                      Options.            (line 1214)
+* SEGMENT_START(SEGMENT, DEFAULT):       Builtin Functions.  (line  164)
+* shared libraries:                      Options.            (line 1210)
 * SHORT(EXPRESSION):                     Output Section Data.
                                                              (line    6)
-* SIZEOF(SECTION):                       Builtin Functions.  (line  166)
-* SIZEOF_HEADERS:                        Builtin Functions.  (line  182)
+* SIZEOF(SECTION):                       Builtin Functions.  (line  172)
+* SIZEOF_HEADERS:                        Builtin Functions.  (line  188)
 * small common symbols:                  Input Section Common.
                                                              (line   20)
 * SORT:                                  Input Section Wildcards.
-                                                             (line   60)
+                                                             (line   62)
 * SORT_BY_ALIGNMENT:                     Input Section Wildcards.
                                                              (line   51)
 * SORT_BY_INIT_PRIORITY:                 Input Section Wildcards.
-                                                             (line   55)
+                                                             (line   57)
 * SORT_BY_NAME:                          Input Section Wildcards.
                                                              (line   43)
 * SORT_NONE:                             Input Section Wildcards.
-                                                             (line   96)
+                                                             (line   98)
 * SPU:                                   SPU ELF.            (line   29)
 * SPU <1>:                               SPU ELF.            (line   46)
 * SPU ELF options:                       SPU ELF.            (line    6)
@@ -7840,63 +7985,63 @@ LD Index
 * SPU plugins:                           SPU ELF.            (line    6)
 * SQUAD(EXPRESSION):                     Output Section Data.
                                                              (line    6)
-* stack size:                            Options.            (line 1940)
+* stack size:                            Options.            (line 1944)
 * standard Unix system:                  Options.            (line    7)
 * start of execution:                    Entry Point.        (line    6)
 * STARTUP(FILENAME):                     File Commands.      (line   82)
-* strip all symbols:                     Options.            (line  513)
-* strip debugger symbols:                Options.            (line  517)
-* stripping all but some symbols:        Options.            (line 1128)
+* strip all symbols:                     Options.            (line  512)
+* strip debugger symbols:                Options.            (line  516)
+* stripping all but some symbols:        Options.            (line 1124)
 * STUB_GROUP_SIZE:                       ARM.                (line  137)
 * SUBALIGN(SUBSECTION_ALIGN):            Forced Input Alignment.
                                                              (line    6)
 * suffixes for integers:                 Constants.          (line   15)
-* symbol defaults:                       Builtin Functions.  (line  119)
+* symbol defaults:                       Builtin Functions.  (line  121)
 * symbol definition, scripts:            Assignments.        (line    6)
 * symbol names:                          Symbols.            (line    6)
-* symbol tracing:                        Options.            (line  591)
+* symbol tracing:                        Options.            (line  590)
 * symbol versions:                       VERSION.            (line    6)
-* symbol-only input:                     Options.            (line  502)
+* symbol-only input:                     Options.            (line  501)
 * symbolic constants:                    Symbolic Constants. (line    6)
-* symbols, from command line:            Options.            (line  887)
+* symbols, from command line:            Options.            (line  883)
 * symbols, relocatable and absolute:     Expression Section. (line    6)
-* symbols, retaining selectively:        Options.            (line 1128)
-* synthesizing linker:                   Options.            (line 1102)
+* symbols, retaining selectively:        Options.            (line 1124)
+* synthesizing linker:                   Options.            (line 1098)
 * synthesizing on H8/300:                H8/300.             (line   14)
 * TARGET(BFDNAME):                       Format Commands.    (line   35)
 * TARGET1:                               ARM.                (line   32)
 * TARGET2:                               ARM.                (line   37)
-* text segment origin, cmd line:         Options.            (line 1293)
+* text segment origin, cmd line:         Options.            (line 1289)
 * thumb entry point:                     ARM.                (line   17)
 * TI COFF versions:                      TI COFF.            (line    6)
-* traditional format:                    Options.            (line 1265)
+* traditional format:                    Options.            (line 1261)
 * trampoline generation on M68HC11:      M68HC11/68HC12.     (line   30)
 * trampoline generation on M68HC12:      M68HC11/68HC12.     (line   30)
-* unallocated address, next:             Builtin Functions.  (line  149)
-* undefined symbol:                      Options.            (line  548)
+* unallocated address, next:             Builtin Functions.  (line  155)
+* undefined symbol:                      Options.            (line  547)
 * undefined symbol in linker script:     Miscellaneous Commands.
                                                              (line   13)
-* undefined symbols, warnings on:        Options.            (line 1441)
+* undefined symbols, warnings on:        Options.            (line 1437)
 * uninitialized data placement:          Input Section Common.
                                                              (line    6)
 * unspecified memory:                    Output Section Data.
                                                              (line   39)
-* usage:                                 Options.            (line  972)
+* usage:                                 Options.            (line  968)
 * USE_BLX:                               ARM.                (line   72)
 * using a DEF file:                      WIN32.              (line   52)
 * using auto-export functionality:       WIN32.              (line   22)
 * Using decorations:                     WIN32.              (line  157)
 * variables, defining:                   Assignments.        (line    6)
-* verbose[=NUMBER]:                      Options.            (line 1336)
-* version:                               Options.            (line  575)
+* verbose[=NUMBER]:                      Options.            (line 1332)
+* version:                               Options.            (line  574)
 * version script:                        VERSION.            (line    6)
-* version script, symbol versions:       Options.            (line 1344)
+* version script, symbol versions:       Options.            (line 1340)
 * VERSION {script text}:                 VERSION.            (line    6)
 * versions of symbols:                   VERSION.            (line    6)
 * VFP11_DENORM_FIX:                      ARM.                (line   81)
-* warnings, on combining symbols:        Options.            (line 1354)
-* warnings, on section alignment:        Options.            (line 1445)
-* warnings, on undefined symbols:        Options.            (line 1441)
+* warnings, on combining symbols:        Options.            (line 1350)
+* warnings, on section alignment:        Options.            (line 1441)
+* warnings, on undefined symbols:        Options.            (line 1437)
 * weak externals:                        WIN32.              (line  400)
 * what is this?:                         Overview.           (line    6)
 * wildcard file name patterns:           Input Section Wildcards.
@@ -7907,88 +8052,91 @@ LD Index
 
 
 Tag Table:
-Node: Top719
-Node: Overview1513
-Node: Invocation2629
-Node: Options3037
-Node: Environment95950
-Node: Scripts97711
-Node: Basic Script Concepts99445
-Node: Script Format102153
-Node: Simple Example103016
-Node: Simple Commands106110
-Node: Entry Point106615
-Node: File Commands107543
-Node: Format Commands111545
-Node: REGION_ALIAS113501
-Node: Miscellaneous Commands118328
-Node: Assignments121936
-Node: Simple Assignments122447
-Node: HIDDEN124178
-Node: PROVIDE124805
-Node: PROVIDE_HIDDEN125998
-Node: Source Code Reference126242
-Node: SECTIONS129822
-Node: Output Section Description131710
-Node: Output Section Name132794
-Node: Output Section Address133671
-Node: Input Section135904
-Node: Input Section Basics136705
-Node: Input Section Wildcards140604
-Node: Input Section Common145692
-Node: Input Section Keep147174
-Node: Input Section Example147664
-Node: Output Section Data148632
-Node: Output Section Keywords151411
-Node: Output Section Discarding154978
-Node: Output Section Attributes156156
-Node: Output Section Type157256
-Node: Output Section LMA158326
-Node: Forced Output Alignment161397
-Node: Forced Input Alignment161665
-Node: Output Section Constraint162053
-Node: Output Section Region162481
-Node: Output Section Phdr162914
-Node: Output Section Fill163578
-Node: Overlay Description164720
-Node: MEMORY169027
-Node: PHDRS173355
-Node: VERSION178609
-Node: Expressions186700
-Node: Constants187629
-Node: Symbolic Constants188503
-Node: Symbols189054
-Node: Orphan Sections189801
-Node: Location Counter190966
-Node: Operators195400
-Node: Evaluation196322
-Node: Expression Section197686
-Node: Builtin Functions201541
-Node: Implicit Linker Scripts209497
-Node: Machine Dependent210272
-Node: H8/300211274
-Node: i960213337
-Node: M68HC11/68HC12215552
-Node: ARM216997
-Node: HPPA ELF32224977
-Node: M68K226600
-Node: MMIX227509
-Node: MSP430228674
-Node: PowerPC ELF32229722
-Node: PowerPC64 ELF64232550
-Node: SPU ELF238704
-Node: TI COFF241338
-Node: WIN32241864
-Node: Xtensa261993
-Node: BFD264959
-Node: BFD outline266417
-Node: BFD information loss267705
-Node: Canonical format270231
-Node: Reporting Bugs274593
-Node: Bug Criteria275287
-Node: Bug Reporting275986
-Node: MRI283055
-Node: GNU Free Documentation License287697
-Node: LD Index312834
+Node: Top709
+Node: Overview1493
+Node: Invocation2609
+Node: Options3017
+Node: Environment97252
+Node: Scripts99013
+Node: Basic Script Concepts100747
+Node: Script Format103455
+Node: Simple Example104318
+Node: Simple Commands107412
+Node: Entry Point107917
+Node: File Commands108845
+Node: Format Commands112847
+Node: REGION_ALIAS114803
+Node: Miscellaneous Commands119630
+Node: Assignments123238
+Node: Simple Assignments123749
+Node: HIDDEN125480
+Node: PROVIDE126107
+Node: PROVIDE_HIDDEN127300
+Node: Source Code Reference127544
+Node: SECTIONS131126
+Node: Output Section Description133014
+Node: Output Section Name134255
+Node: Output Section Address135132
+Node: Input Section137365
+Node: Input Section Basics138166
+Node: Input Section Wildcards142065
+Node: Input Section Common147266
+Node: Input Section Keep148748
+Node: Input Section Example149238
+Node: Output Section Data150206
+Node: Output Section Keywords152985
+Node: Output Section Discarding156552
+Node: Output Section Attributes158042
+Node: Output Section Type159142
+Node: Output Section LMA160212
+Node: Forced Output Alignment163283
+Node: Forced Input Alignment163712
+Node: Output Section Constraint164100
+Node: Output Section Region164528
+Node: Output Section Phdr164961
+Node: Output Section Fill165625
+Node: Overlay Description166767
+Node: MEMORY171212
+Node: PHDRS175540
+Node: VERSION180794
+Node: Expressions188885
+Node: Constants189814
+Node: Symbolic Constants190688
+Node: Symbols191239
+Node: Orphan Sections191986
+Node: Location Counter193151
+Node: Operators197585
+Node: Evaluation198507
+Node: Expression Section199871
+Node: Builtin Functions203726
+Node: Implicit Linker Scripts211913
+Node: Machine Dependent212688
+Node: H8/300213795
+Node: i960215858
+Node: M68HC11/68HC12217554
+Node: ARM218999
+Node: HPPA ELF32227675
+Node: M68K229298
+Node: MIPS230207
+Node: MMIX230731
+Node: MSP430231896
+Node: NDS32232936
+Node: Nios II233902
+Node: PowerPC ELF32235218
+Node: PowerPC64 ELF64238049
+Node: SPU ELF244203
+Node: TI COFF246837
+Node: WIN32247363
+Node: Xtensa267492
+Node: BFD270458
+Node: BFD outline271916
+Node: BFD information loss273204
+Node: Canonical format275730
+Node: Reporting Bugs280092
+Node: Bug Criteria280786
+Node: Bug Reporting281485
+Node: MRI288523
+Node: GNU Free Documentation License293165
+Node: LD Index318302
 
 End Tag Table
