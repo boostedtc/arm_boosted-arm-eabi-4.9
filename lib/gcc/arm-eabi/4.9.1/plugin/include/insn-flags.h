@@ -306,6 +306,8 @@
 #define HAVE_smaxdf3 ((TARGET_HARD_FLOAT && TARGET_FPU_ARMV8 && TARGET_VFP_DOUBLE) && (TARGET_VFP_DOUBLE))
 #define HAVE_sminsf3 ((TARGET_HARD_FLOAT && TARGET_FPU_ARMV8 ) && (TARGET_VFP))
 #define HAVE_smindf3 ((TARGET_HARD_FLOAT && TARGET_FPU_ARMV8 && TARGET_VFP_DOUBLE) && (TARGET_VFP_DOUBLE))
+#define HAVE_set_fpscr (TARGET_VFP)
+#define HAVE_get_fpscr (TARGET_VFP)
 #define HAVE_tls_load_dot_plus_four (TARGET_THUMB2)
 #define HAVE_thumb2_zero_extendqisi2_v6 (TARGET_THUMB2 && arm_arch6)
 #define HAVE_thumb2_casesi_internal (TARGET_THUMB2 && !flag_pic)
@@ -748,6 +750,11 @@
 #define HAVE_neon_vqabsv8hi (TARGET_NEON)
 #define HAVE_neon_vqabsv2si (TARGET_NEON)
 #define HAVE_neon_vqabsv4si (TARGET_NEON)
+#define HAVE_neon_bswapv4hi (TARGET_NEON)
+#define HAVE_neon_bswapv8hi (TARGET_NEON)
+#define HAVE_neon_bswapv2si (TARGET_NEON)
+#define HAVE_neon_bswapv4si (TARGET_NEON)
+#define HAVE_neon_bswapv2di (TARGET_NEON)
 #define HAVE_neon_vqnegv8qi (TARGET_NEON)
 #define HAVE_neon_vqnegv16qi (TARGET_NEON)
 #define HAVE_neon_vqnegv4hi (TARGET_NEON)
@@ -2649,6 +2656,8 @@ extern rtx        gen_smaxsf3                           (rtx, rtx, rtx);
 extern rtx        gen_smaxdf3                           (rtx, rtx, rtx);
 extern rtx        gen_sminsf3                           (rtx, rtx, rtx);
 extern rtx        gen_smindf3                           (rtx, rtx, rtx);
+extern rtx        gen_set_fpscr                         (rtx);
+extern rtx        gen_get_fpscr                         (rtx);
 extern rtx        gen_tls_load_dot_plus_four            (rtx, rtx, rtx, rtx);
 extern rtx        gen_thumb2_zero_extendqisi2_v6        (rtx, rtx);
 extern rtx        gen_thumb2_casesi_internal            (rtx, rtx, rtx, rtx);
@@ -3087,6 +3096,11 @@ extern rtx        gen_neon_vqabsv4hi                    (rtx, rtx, rtx);
 extern rtx        gen_neon_vqabsv8hi                    (rtx, rtx, rtx);
 extern rtx        gen_neon_vqabsv2si                    (rtx, rtx, rtx);
 extern rtx        gen_neon_vqabsv4si                    (rtx, rtx, rtx);
+extern rtx        gen_neon_bswapv4hi                    (rtx, rtx);
+extern rtx        gen_neon_bswapv8hi                    (rtx, rtx);
+extern rtx        gen_neon_bswapv2si                    (rtx, rtx);
+extern rtx        gen_neon_bswapv4si                    (rtx, rtx);
+extern rtx        gen_neon_bswapv2di                    (rtx, rtx);
 extern rtx        gen_neon_vqnegv8qi                    (rtx, rtx, rtx);
 extern rtx        gen_neon_vqnegv16qi                   (rtx, rtx, rtx);
 extern rtx        gen_neon_vqnegv4hi                    (rtx, rtx, rtx);

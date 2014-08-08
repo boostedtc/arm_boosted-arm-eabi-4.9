@@ -32019,6 +32019,7 @@ instructions, but allow the compiler to schedule those calls.
 * ARM iWMMXt Built-in Functions::
 * ARM NEON Intrinsics::
 * ARM ACLE Intrinsics::
+* ARM Floating Point Status and Control Intrinsics::
 * AVR Built-in Functions::
 * Blackfin Built-in Functions::
 * FR-V Built-in Functions::
@@ -38826,7 +38827,7 @@ available when the '-mfpu=neon' switch is used:
      _Form of expected instruction(s):_ 'vmull.p64 Q0, D1, D2'
 
 
-File: gcc.info,  Node: ARM ACLE Intrinsics,  Next: AVR Built-in Functions,  Prev: ARM NEON Intrinsics,  Up: Target Builtins
+File: gcc.info,  Node: ARM ACLE Intrinsics,  Next: ARM Floating Point Status and Control Intrinsics,  Prev: ARM NEON Intrinsics,  Up: Target Builtins
 
 6.57.8 ARM ACLE Intrinsics
 --------------------------
@@ -38865,10 +38866,22 @@ the target processor specified with '-mcpu' supports it.
      instructions.
 
 
-File: gcc.info,  Node: AVR Built-in Functions,  Next: Blackfin Built-in Functions,  Prev: ARM ACLE Intrinsics,  Up: Target Builtins
+File: gcc.info,  Node: ARM Floating Point Status and Control Intrinsics,  Next: AVR Built-in Functions,  Prev: ARM ACLE Intrinsics,  Up: Target Builtins
 
-6.57.9 AVR Built-in Functions
------------------------------
+6.57.9 ARM Floating Point Status and Control Intrinsics
+-------------------------------------------------------
+
+These built-in functions are available for the ARM family of processors
+with floating-point unit.
+
+     unsigned int __builtin_arm_get_fpscr ()
+     void __builtin_arm_set_fpscr (unsigned int)
+
+
+File: gcc.info,  Node: AVR Built-in Functions,  Next: Blackfin Built-in Functions,  Prev: ARM Floating Point Status and Control Intrinsics,  Up: Target Builtins
+
+6.57.10 AVR Built-in Functions
+------------------------------
 
 For each built-in function for AVR, there is an equally named, uppercase
 built-in macro defined.  That way users can easily query if or if not a
@@ -38942,7 +38955,7 @@ values to non-contiguous port layouts.  Some examples:
 
 File: gcc.info,  Node: Blackfin Built-in Functions,  Next: FR-V Built-in Functions,  Prev: AVR Built-in Functions,  Up: Target Builtins
 
-6.57.10 Blackfin Built-in Functions
+6.57.11 Blackfin Built-in Functions
 -----------------------------------
 
 Currently, there are two Blackfin-specific built-in functions.  These
@@ -38957,7 +38970,7 @@ instructions.  These functions are named as follows:
 
 File: gcc.info,  Node: FR-V Built-in Functions,  Next: X86 Built-in Functions,  Prev: Blackfin Built-in Functions,  Up: Target Builtins
 
-6.57.11 FR-V Built-in Functions
+6.57.12 FR-V Built-in Functions
 -------------------------------
 
 GCC provides many FR-V-specific built-in functions.  In general, these
@@ -38981,7 +38994,7 @@ tabular form.
 
 File: gcc.info,  Node: Argument Types,  Next: Directly-mapped Integer Functions,  Up: FR-V Built-in Functions
 
-6.57.11.1 Argument Types
+6.57.12.1 Argument Types
 ........................
 
 The arguments to the built-in functions can be divided into three
@@ -39020,7 +39033,7 @@ details.
 
 File: gcc.info,  Node: Directly-mapped Integer Functions,  Next: Directly-mapped Media Functions,  Prev: Argument Types,  Up: FR-V Built-in Functions
 
-6.57.11.2 Directly-mapped Integer Functions
+6.57.12.2 Directly-mapped Integer Functions
 ...........................................
 
 The functions listed below map directly to FR-V I-type instructions.
@@ -39040,7 +39053,7 @@ Function prototype               Example usage           Assembly output
 
 File: gcc.info,  Node: Directly-mapped Media Functions,  Next: Raw read/write Functions,  Prev: Directly-mapped Integer Functions,  Up: FR-V Built-in Functions
 
-6.57.11.3 Directly-mapped Media Functions
+6.57.12.3 Directly-mapped Media Functions
 .........................................
 
 The functions listed below map directly to FR-V M-type instructions.
@@ -39187,7 +39200,7 @@ sw2)'                            B)'                     A,B,C'
 
 File: gcc.info,  Node: Raw read/write Functions,  Next: Other Built-in Functions,  Prev: Directly-mapped Media Functions,  Up: FR-V Built-in Functions
 
-6.57.11.4 Raw read/write Functions
+6.57.12.4 Raw read/write Functions
 ..................................
 
 This sections describes built-in functions related to read and write
@@ -39208,7 +39221,7 @@ described in Fujitsu's manual described above.
 
 File: gcc.info,  Node: Other Built-in Functions,  Prev: Raw read/write Functions,  Up: FR-V Built-in Functions
 
-6.57.11.5 Other Built-in Functions
+6.57.12.5 Other Built-in Functions
 ..................................
 
 This section describes built-in functions that are not named after a
@@ -39241,7 +39254,7 @@ specific FR-V instruction.
 
 File: gcc.info,  Node: X86 Built-in Functions,  Next: X86 transactional memory intrinsics,  Prev: FR-V Built-in Functions,  Up: Target Builtins
 
-6.57.12 X86 Built-in Functions
+6.57.13 X86 Built-in Functions
 ------------------------------
 
 These built-in functions are available for the i386 and x86-64 family of
@@ -40548,7 +40561,7 @@ transactional memory intrinsics:: should be used instead.
 
 File: gcc.info,  Node: X86 transactional memory intrinsics,  Next: MIPS DSP Built-in Functions,  Prev: X86 Built-in Functions,  Up: Target Builtins
 
-6.57.13 X86 transaction memory intrinsics
+6.57.14 X86 transaction memory intrinsics
 -----------------------------------------
 
 Hardware transactional memory intrinsics for i386.  These allow to use
@@ -40614,7 +40627,7 @@ and suitable fallback code always needs to be supplied.
 
 File: gcc.info,  Node: MIPS DSP Built-in Functions,  Next: MIPS Paired-Single Support,  Prev: X86 transactional memory intrinsics,  Up: Target Builtins
 
-6.57.14 MIPS DSP Built-in Functions
+6.57.15 MIPS DSP Built-in Functions
 -----------------------------------
 
 The MIPS DSP Application-Specific Extension (ASE) includes new
@@ -40887,7 +40900,7 @@ details on what each instruction does.
 
 File: gcc.info,  Node: MIPS Paired-Single Support,  Next: MIPS Loongson Built-in Functions,  Prev: MIPS DSP Built-in Functions,  Up: Target Builtins
 
-6.57.15 MIPS Paired-Single Support
+6.57.16 MIPS Paired-Single Support
 ----------------------------------
 
 The MIPS64 architecture includes a number of instructions that operate
@@ -40923,7 +40936,7 @@ targets.  For example, the code above sets the lower half of 'a' to
 
 File: gcc.info,  Node: MIPS Loongson Built-in Functions,  Next: Other MIPS Built-in Functions,  Prev: MIPS Paired-Single Support,  Up: Target Builtins
 
-6.57.16 MIPS Loongson Built-in Functions
+6.57.17 MIPS Loongson Built-in Functions
 ----------------------------------------
 
 GCC provides intrinsics to access the SIMD instructions provided by the
@@ -41054,7 +41067,7 @@ each instruction.
 
 File: gcc.info,  Node: Paired-Single Arithmetic,  Next: Paired-Single Built-in Functions,  Up: MIPS Loongson Built-in Functions
 
-6.57.16.1 Paired-Single Arithmetic
+6.57.17.1 Paired-Single Arithmetic
 ..................................
 
 The table below lists the 'v2sf' operations for which hardware support
@@ -41078,7 +41091,7 @@ the command-line option '-mno-fused-madd'.
 
 File: gcc.info,  Node: Paired-Single Built-in Functions,  Next: MIPS-3D Built-in Functions,  Prev: Paired-Single Arithmetic,  Up: MIPS Loongson Built-in Functions
 
-6.57.16.2 Paired-Single Built-in Functions
+6.57.17.2 Paired-Single Built-in Functions
 ..........................................
 
 The following paired-single functions map directly to a particular MIPS
@@ -41157,7 +41170,7 @@ case, COND can be any of the 16 floating-point conditions: 'f', 'un',
 
 File: gcc.info,  Node: MIPS-3D Built-in Functions,  Prev: Paired-Single Built-in Functions,  Up: MIPS Loongson Built-in Functions
 
-6.57.16.3 MIPS-3D Built-in Functions
+6.57.17.3 MIPS-3D Built-in Functions
 ....................................
 
 The MIPS-3D Application-Specific Extension (ASE) includes additional
@@ -41305,7 +41318,7 @@ case, COND can be any of the 16 floating-point conditions: 'f', 'un',
 
 File: gcc.info,  Node: Other MIPS Built-in Functions,  Next: MSP430 Built-in Functions,  Prev: MIPS Loongson Built-in Functions,  Up: Target Builtins
 
-6.57.17 Other MIPS Built-in Functions
+6.57.18 Other MIPS Built-in Functions
 -------------------------------------
 
 GCC provides other MIPS-specific built-in functions:
@@ -41329,7 +41342,7 @@ GCC provides other MIPS-specific built-in functions:
 
 File: gcc.info,  Node: MSP430 Built-in Functions,  Next: NDS32 Built-in Functions,  Prev: Other MIPS Built-in Functions,  Up: Target Builtins
 
-6.57.18 MSP430 Built-in Functions
+6.57.19 MSP430 Built-in Functions
 ---------------------------------
 
 GCC provides a couple of special builtin functions to aid in the writing
@@ -41350,7 +41363,7 @@ of interrupt handlers in C.
 
 File: gcc.info,  Node: NDS32 Built-in Functions,  Next: picoChip Built-in Functions,  Prev: MSP430 Built-in Functions,  Up: Target Builtins
 
-6.57.19 NDS32 Built-in Functions
+6.57.20 NDS32 Built-in Functions
 --------------------------------
 
 These built-in functions are available for the NDS32 target:
@@ -41383,7 +41396,7 @@ These built-in functions are available for the NDS32 target:
 
 File: gcc.info,  Node: picoChip Built-in Functions,  Next: PowerPC Built-in Functions,  Prev: NDS32 Built-in Functions,  Up: Target Builtins
 
-6.57.20 picoChip Built-in Functions
+6.57.21 picoChip Built-in Functions
 -----------------------------------
 
 GCC provides an interface to selected machine instructions from the
@@ -41419,7 +41432,7 @@ picoChip instruction set.
 
 File: gcc.info,  Node: PowerPC Built-in Functions,  Next: PowerPC AltiVec/VSX Built-in Functions,  Prev: picoChip Built-in Functions,  Up: Target Builtins
 
-6.57.21 PowerPC Built-in Functions
+6.57.22 PowerPC Built-in Functions
 ----------------------------------
 
 These built-in functions are available for the PowerPC family of
@@ -41496,7 +41509,7 @@ of processors when the Vector Scalar (vsx) instruction set is available:
 
 File: gcc.info,  Node: PowerPC AltiVec/VSX Built-in Functions,  Next: PowerPC Hardware Transactional Memory Built-in Functions,  Prev: PowerPC Built-in Functions,  Up: Target Builtins
 
-6.57.22 PowerPC AltiVec Built-in Functions
+6.57.23 PowerPC AltiVec Built-in Functions
 ------------------------------------------
 
 GCC provides an interface for the PowerPC family of processors to access
@@ -43956,7 +43969,7 @@ constant integer in the range of 0 to 15.
 
 File: gcc.info,  Node: PowerPC Hardware Transactional Memory Built-in Functions,  Next: RX Built-in Functions,  Prev: PowerPC AltiVec/VSX Built-in Functions,  Up: Target Builtins
 
-6.57.23 PowerPC Hardware Transactional Memory Built-in Functions
+6.57.24 PowerPC Hardware Transactional Memory Built-in Functions
 ----------------------------------------------------------------
 
 GCC provides two interfaces for accessing the Hardware Transactional
@@ -43966,7 +43979,7 @@ interface, consisting of built-in functions specific to PowerPC and a
 higher level interface consisting of inline functions that are common
 between PowerPC and S/390.
 
-6.57.23.1 PowerPC HTM Low Level Built-in Functions
+6.57.24.1 PowerPC HTM Low Level Built-in Functions
 ..................................................
 
 The following low level built-in functions are available with '-mhtm' or
@@ -44070,7 +44083,7 @@ using the following code example:
          /* Code to use in transaction suspended state.  */
        }
 
-6.57.23.2 PowerPC HTM High Level Inline Functions
+6.57.24.2 PowerPC HTM High Level Inline Functions
 .................................................
 
 The following high level HTM interface is made available by including
@@ -44136,7 +44149,7 @@ work on either PowerPC or S/390:
 
 File: gcc.info,  Node: RX Built-in Functions,  Next: S/390 System z Built-in Functions,  Prev: PowerPC Hardware Transactional Memory Built-in Functions,  Up: Target Builtins
 
-6.57.24 RX Built-in Functions
+6.57.25 RX Built-in Functions
 -----------------------------
 
 GCC supports some of the RX instructions which cannot be expressed in
@@ -44234,7 +44247,7 @@ following functions are supported:
 
 File: gcc.info,  Node: S/390 System z Built-in Functions,  Next: SH Built-in Functions,  Prev: RX Built-in Functions,  Up: Target Builtins
 
-6.57.25 S/390 System z Built-in Functions
+6.57.26 S/390 System z Built-in Functions
 -----------------------------------------
 
  -- Built-in Function: int __builtin_tbegin (void*)
@@ -44339,7 +44352,7 @@ File: gcc.info,  Node: S/390 System z Built-in Functions,  Next: SH Built-in Fun
 
 File: gcc.info,  Node: SH Built-in Functions,  Next: SPARC VIS Built-in Functions,  Prev: S/390 System z Built-in Functions,  Up: Target Builtins
 
-6.57.26 SH Built-in Functions
+6.57.27 SH Built-in Functions
 -----------------------------
 
 The following built-in functions are supported on the SH1, SH2, SH3 and
@@ -44374,7 +44387,7 @@ SH4 families of processors:
 
 File: gcc.info,  Node: SPARC VIS Built-in Functions,  Next: SPU Built-in Functions,  Prev: SH Built-in Functions,  Up: Target Builtins
 
-6.57.27 SPARC VIS Built-in Functions
+6.57.28 SPARC VIS Built-in Functions
 ------------------------------------
 
 GCC supports SIMD operations on the SPARC using both the generic vector
@@ -44514,7 +44527,7 @@ functions also become available:
 
 File: gcc.info,  Node: SPU Built-in Functions,  Next: TI C6X Built-in Functions,  Prev: SPARC VIS Built-in Functions,  Up: Target Builtins
 
-6.57.28 SPU Built-in Functions
+6.57.29 SPU Built-in Functions
 ------------------------------
 
 GCC provides extensions for the SPU processor as described in the
@@ -44559,7 +44572,7 @@ are subject to change without notice.
 
 File: gcc.info,  Node: TI C6X Built-in Functions,  Next: TILE-Gx Built-in Functions,  Prev: SPU Built-in Functions,  Up: Target Builtins
 
-6.57.29 TI C6X Built-in Functions
+6.57.30 TI C6X Built-in Functions
 ---------------------------------
 
 GCC provides intrinsics to access certain instructions of the TI C6X
@@ -44599,7 +44612,7 @@ C6X instructions.
 
 File: gcc.info,  Node: TILE-Gx Built-in Functions,  Next: TILEPro Built-in Functions,  Prev: TI C6X Built-in Functions,  Up: Target Builtins
 
-6.57.30 TILE-Gx Built-in Functions
+6.57.31 TILE-Gx Built-in Functions
 ----------------------------------
 
 GCC provides intrinsics to access every instruction of the TILE-Gx
@@ -44632,7 +44645,7 @@ that no network operations before it are reordered with those after it.
 
 File: gcc.info,  Node: TILEPro Built-in Functions,  Prev: TILE-Gx Built-in Functions,  Up: Target Builtins
 
-6.57.31 TILEPro Built-in Functions
+6.57.32 TILEPro Built-in Functions
 ----------------------------------
 
 GCC provides intrinsics to access every instruction of the TILEPro
@@ -56923,139 +56936,140 @@ Node: Object Size Checking1287159
 Node: Cilk Plus Builtins1292652
 Node: Other Builtins1293521
 Node: Target Builtins1322828
-Node: AArch64 Built-in Functions1324278
-Node: Alpha Built-in Functions1324733
-Node: Altera Nios II Built-in Functions1327781
-Node: ARC Built-in Functions1331768
-Node: ARC SIMD Built-in Functions1336980
-Node: ARM iWMMXt Built-in Functions1345876
-Node: ARM NEON Intrinsics1352859
-Node: ARM ACLE Intrinsics1570353
-Node: AVR Built-in Functions1571681
-Node: Blackfin Built-in Functions1574759
-Node: FR-V Built-in Functions1575378
-Node: Argument Types1576241
-Node: Directly-mapped Integer Functions1577995
-Node: Directly-mapped Media Functions1579079
-Node: Raw read/write Functions1587285
-Node: Other Built-in Functions1588193
-Node: X86 Built-in Functions1589379
-Node: X86 transactional memory intrinsics1648572
-Node: MIPS DSP Built-in Functions1651248
-Node: MIPS Paired-Single Support1663757
-Node: MIPS Loongson Built-in Functions1665256
-Node: Paired-Single Arithmetic1671771
-Node: Paired-Single Built-in Functions1672719
-Node: MIPS-3D Built-in Functions1675386
-Node: Other MIPS Built-in Functions1680764
-Node: MSP430 Built-in Functions1681769
-Node: NDS32 Built-in Functions1682673
-Node: picoChip Built-in Functions1683966
-Node: PowerPC Built-in Functions1685309
-Node: PowerPC AltiVec/VSX Built-in Functions1689018
-Node: PowerPC Hardware Transactional Memory Built-in Functions1821916
-Node: RX Built-in Functions1828457
-Node: S/390 System z Built-in Functions1832490
-Node: SH Built-in Functions1837719
-Node: SPARC VIS Built-in Functions1839112
-Node: SPU Built-in Functions1844715
-Node: TI C6X Built-in Functions1846532
-Node: TILE-Gx Built-in Functions1847557
-Node: TILEPro Built-in Functions1848676
-Node: Target Format Checks1849745
-Node: Solaris Format Checks1850177
-Node: Darwin Format Checks1850603
-Node: Pragmas1851421
-Node: ARM Pragmas1852157
-Node: M32C Pragmas1852760
-Node: MeP Pragmas1853832
-Node: RS/6000 and PowerPC Pragmas1855900
-Node: Darwin Pragmas1856641
-Node: Solaris Pragmas1857708
-Node: Symbol-Renaming Pragmas1858872
-Node: Structure-Packing Pragmas1860428
-Node: Weak Pragmas1862073
-Node: Diagnostic Pragmas1862807
-Node: Visibility Pragmas1865916
-Node: Push/Pop Macro Pragmas1866668
-Node: Function Specific Option Pragmas1867641
-Node: Loop-Specific Pragmas1869832
-Node: Unnamed Fields1870931
-Node: Thread-Local1873158
-Node: C99 Thread-Local Edits1875263
-Node: C++98 Thread-Local Edits1877261
-Node: Binary constants1880706
-Node: C++ Extensions1881377
-Node: C++ Volatiles1883088
-Node: Restricted Pointers1885436
-Node: Vague Linkage1887027
-Node: C++ Interface1890650
-Ref: C++ Interface-Footnote-11894938
-Node: Template Instantiation1895076
-Node: Bound member functions1901662
-Node: C++ Attributes1903194
-Node: Function Multiversioning1906773
-Node: Namespace Association1908590
-Node: Type Traits1909970
-Node: Java Exceptions1916453
-Node: Deprecated Features1917843
-Node: Backwards Compatibility1920810
-Node: Objective-C1922157
-Node: GNU Objective-C runtime API1922764
-Node: Modern GNU Objective-C runtime API1923771
-Node: Traditional GNU Objective-C runtime API1926207
-Node: Executing code before main1926934
-Node: What you can and what you cannot do in +load1929674
-Node: Type encoding1932062
-Node: Legacy type encoding1937089
-Node: @encode1938179
-Node: Method signatures1938720
-Node: Garbage Collection1940712
-Node: Constant string objects1943402
-Node: compatibility_alias1945911
-Node: Exceptions1946632
-Node: Synchronization1949342
-Node: Fast enumeration1950526
-Node: Using fast enumeration1950838
-Node: c99-like fast enumeration syntax1952049
-Node: Fast enumeration details1952752
-Node: Fast enumeration protocol1955092
-Node: Messaging with the GNU Objective-C runtime1958244
-Node: Dynamically registering methods1959616
-Node: Forwarding hook1961307
-Node: Compatibility1964347
-Node: Gcov1970903
-Node: Gcov Intro1971436
-Node: Invoking Gcov1974154
-Node: Gcov and Optimization1988394
-Node: Gcov Data Files1991396
-Node: Cross-profiling1992791
-Node: Trouble1994645
-Node: Actual Bugs1996057
-Node: Interoperation1996504
-Node: Incompatibilities2003395
-Node: Fixed Headers2011547
-Node: Standard Libraries2013205
-Node: Disappointments2014577
-Node: C++ Misunderstandings2018936
-Node: Static Definitions2019747
-Node: Name lookup2020800
-Ref: Name lookup-Footnote-12025580
-Node: Temporaries2025769
-Node: Copy Assignment2027745
-Node: Non-bugs2029552
-Node: Warnings and Errors2040058
-Node: Bugs2041820
-Node: Bug Criteria2042287
-Node: Bug Reporting2044497
-Node: Service2044718
-Node: Contributing2045537
-Node: Funding2046277
-Node: GNU Project2048767
-Node: Copying2049413
-Node: GNU Free Documentation License2086922
-Node: Contributors2112040
-Node: Option Index2149909
-Node: Keyword Index2360341
+Node: AArch64 Built-in Functions1324331
+Node: Alpha Built-in Functions1324786
+Node: Altera Nios II Built-in Functions1327834
+Node: ARC Built-in Functions1331821
+Node: ARC SIMD Built-in Functions1337033
+Node: ARM iWMMXt Built-in Functions1345929
+Node: ARM NEON Intrinsics1352912
+Node: ARM ACLE Intrinsics1570406
+Node: ARM Floating Point Status and Control Intrinsics1571760
+Node: AVR Built-in Functions1572223
+Node: Blackfin Built-in Functions1575332
+Node: FR-V Built-in Functions1575951
+Node: Argument Types1576814
+Node: Directly-mapped Integer Functions1578568
+Node: Directly-mapped Media Functions1579652
+Node: Raw read/write Functions1587858
+Node: Other Built-in Functions1588766
+Node: X86 Built-in Functions1589952
+Node: X86 transactional memory intrinsics1649145
+Node: MIPS DSP Built-in Functions1651821
+Node: MIPS Paired-Single Support1664330
+Node: MIPS Loongson Built-in Functions1665829
+Node: Paired-Single Arithmetic1672344
+Node: Paired-Single Built-in Functions1673292
+Node: MIPS-3D Built-in Functions1675959
+Node: Other MIPS Built-in Functions1681337
+Node: MSP430 Built-in Functions1682342
+Node: NDS32 Built-in Functions1683246
+Node: picoChip Built-in Functions1684539
+Node: PowerPC Built-in Functions1685882
+Node: PowerPC AltiVec/VSX Built-in Functions1689591
+Node: PowerPC Hardware Transactional Memory Built-in Functions1822489
+Node: RX Built-in Functions1829030
+Node: S/390 System z Built-in Functions1833063
+Node: SH Built-in Functions1838292
+Node: SPARC VIS Built-in Functions1839685
+Node: SPU Built-in Functions1845288
+Node: TI C6X Built-in Functions1847105
+Node: TILE-Gx Built-in Functions1848130
+Node: TILEPro Built-in Functions1849249
+Node: Target Format Checks1850318
+Node: Solaris Format Checks1850750
+Node: Darwin Format Checks1851176
+Node: Pragmas1851994
+Node: ARM Pragmas1852730
+Node: M32C Pragmas1853333
+Node: MeP Pragmas1854405
+Node: RS/6000 and PowerPC Pragmas1856473
+Node: Darwin Pragmas1857214
+Node: Solaris Pragmas1858281
+Node: Symbol-Renaming Pragmas1859445
+Node: Structure-Packing Pragmas1861001
+Node: Weak Pragmas1862646
+Node: Diagnostic Pragmas1863380
+Node: Visibility Pragmas1866489
+Node: Push/Pop Macro Pragmas1867241
+Node: Function Specific Option Pragmas1868214
+Node: Loop-Specific Pragmas1870405
+Node: Unnamed Fields1871504
+Node: Thread-Local1873731
+Node: C99 Thread-Local Edits1875836
+Node: C++98 Thread-Local Edits1877834
+Node: Binary constants1881279
+Node: C++ Extensions1881950
+Node: C++ Volatiles1883661
+Node: Restricted Pointers1886009
+Node: Vague Linkage1887600
+Node: C++ Interface1891223
+Ref: C++ Interface-Footnote-11895511
+Node: Template Instantiation1895649
+Node: Bound member functions1902235
+Node: C++ Attributes1903767
+Node: Function Multiversioning1907346
+Node: Namespace Association1909163
+Node: Type Traits1910543
+Node: Java Exceptions1917026
+Node: Deprecated Features1918416
+Node: Backwards Compatibility1921383
+Node: Objective-C1922730
+Node: GNU Objective-C runtime API1923337
+Node: Modern GNU Objective-C runtime API1924344
+Node: Traditional GNU Objective-C runtime API1926780
+Node: Executing code before main1927507
+Node: What you can and what you cannot do in +load1930247
+Node: Type encoding1932635
+Node: Legacy type encoding1937662
+Node: @encode1938752
+Node: Method signatures1939293
+Node: Garbage Collection1941285
+Node: Constant string objects1943975
+Node: compatibility_alias1946484
+Node: Exceptions1947205
+Node: Synchronization1949915
+Node: Fast enumeration1951099
+Node: Using fast enumeration1951411
+Node: c99-like fast enumeration syntax1952622
+Node: Fast enumeration details1953325
+Node: Fast enumeration protocol1955665
+Node: Messaging with the GNU Objective-C runtime1958817
+Node: Dynamically registering methods1960189
+Node: Forwarding hook1961880
+Node: Compatibility1964920
+Node: Gcov1971476
+Node: Gcov Intro1972009
+Node: Invoking Gcov1974727
+Node: Gcov and Optimization1988967
+Node: Gcov Data Files1991969
+Node: Cross-profiling1993364
+Node: Trouble1995218
+Node: Actual Bugs1996630
+Node: Interoperation1997077
+Node: Incompatibilities2003968
+Node: Fixed Headers2012120
+Node: Standard Libraries2013778
+Node: Disappointments2015150
+Node: C++ Misunderstandings2019509
+Node: Static Definitions2020320
+Node: Name lookup2021373
+Ref: Name lookup-Footnote-12026153
+Node: Temporaries2026342
+Node: Copy Assignment2028318
+Node: Non-bugs2030125
+Node: Warnings and Errors2040631
+Node: Bugs2042393
+Node: Bug Criteria2042860
+Node: Bug Reporting2045070
+Node: Service2045291
+Node: Contributing2046110
+Node: Funding2046850
+Node: GNU Project2049340
+Node: Copying2049986
+Node: GNU Free Documentation License2087495
+Node: Contributors2112613
+Node: Option Index2150482
+Node: Keyword Index2360914
 
 End Tag Table
