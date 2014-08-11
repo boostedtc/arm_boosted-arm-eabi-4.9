@@ -3,7 +3,7 @@ OUTPUT_FORMAT("elf32-bigarm", "elf32-bigarm",
 	      "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(_start)
-SEARCH_DIR("/tmp/boosted-4.9-huleh/arm-eabi-4.9/arm-linux-android/lib");
+SEARCH_DIR("/tmp/ndk-hieu/build/toolchain/prefix/arm-linux-android/lib");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
@@ -105,13 +105,13 @@ SECTIONS
   }
   .init_array     :
   {
-    KEEP (*(SORT(.init_array.*)))
-    KEEP (*(.init_array ))
+    KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
+    KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
   }
   .fini_array     :
   {
-    KEEP (*(SORT(.fini_array.*)))
-    KEEP (*(.fini_array ))
+    KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
+    KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
   }
   .ctors          :
   {
